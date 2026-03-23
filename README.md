@@ -1,6 +1,6 @@
 # EduTrack - Modern Learning Management System (Frontend)
 
-![Angular](https://img.shields.io/badge/Angular-18-DD0031?style=for-the-badge&logo=angular)
+![Angular](https://img.shields.io/badge/Angular-21-DD0031?style=for-the-badge&logo=angular)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
