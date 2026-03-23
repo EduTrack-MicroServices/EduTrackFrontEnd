@@ -1,59 +1,58 @@
-# EduTrackFrontEnd
+# EduTrack - Modern Learning Management System (Frontend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.2.
+![Angular](https://img.shields.io/badge/Angular-18-DD0031?style=for-the-badge&logo=angular)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-## Development server
+**EduTrack** is a responsive, role-based Learning Management System (LMS) built with **Angular 18**. It serves as the frontend for a robust microservices ecosystem, providing a seamless academic experience for Students, Instructors, and Administrators.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## 🚀 Key Features
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 👤 User Authentication & Security
+* **Role-Based Access Control (RBAC):** Specific views and permissions for `STUDENT`, `INSTRUCTOR`, and `ADMIN`.
+* **JWT Integration:** Secure state management using JSON Web Tokens for cross-microservice communication.
+* **Auto-Logout & Interceptors:** Functional interceptors to handle `401 Unauthorized` errors and global session expiration.
+* **Guarded Routes:** Protection against unauthorized access using Angular Route Guards.
 
-## Code scaffolding
+### 🎓 Academic Management
+* **Program Discovery:** Browse programs with a hierarchical flow: `Program` → `Course` → `Module` → `Content`.
+* **Real-time Enrollment:** Instant checking and one-click enrollment logic.
+* **Interactive Classroom:** Integrated viewer for YouTube videos and PDF documents using secure Sanity-checked iframes.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 🛠️ Admin & Instructor Tools
+* **User Management:** Administrative console to manage, approve, or reject user registrations.
+* **Curriculum Editor:** Full CRUD capabilities for managing the academic roadmap.
+* **Status Tracking:** (In Progress) Progress-tracking logic to unlock advanced assessments.
 
-```bash
-ng generate component component-name
-```
+---
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 💻 Tech Stack
 
-```bash
-ng generate --help
-```
+* **Framework:** [Angular 21](https://angular.dev/) (Standalone Components)
+* **State Management:** Angular **Signals** for reactive, high-performance UI updates.
+* **Styling:** Bootstrap 5 & Bootstrap Icons.
+* **Networking:** Functional `HttpClient` Interceptors.
+* **Security:** `jwt-decode` for payload parsing and Role-based guards.
 
-## Building
+---
 
-To build the project run:
+## 📂 Project Structure
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```plaintext
+src/app/
+├── core/
+│   ├── components/      # Global Layout (Sidebar, Navbar)
+│   ├── interceptors/    # Auth and Error handling logic
+│   ├── guards/          # Route protection (AuthGuard, GuestGuard)
+│   ├── models/          # TypeScript interfaces for API responses
+│   └── services/        # API logic (Auth, Course, Enrollment, Content)
+├── features/
+│   ├── auth/            # Login & Multi-role Registration
+│   ├── dashboard/       # Role-specific landing pages
+│   ├── programs/        # Program discovery and details
+│   ├── courses/         # Course management & lists
+│   ├── modules/         # Module viewers and editors
+│   └── contents/        # Video viewer & PDF materials
+└── app.routes.ts        # Centralized routing configuration
