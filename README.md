@@ -2,7 +2,6 @@
 
 ![Angular](https://img.shields.io/badge/Angular-21-DD0031?style=for-the-badge&logo=angular)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 **EduTrack** is a responsive, role-based Learning Management System (LMS) built with **Angular 18**. It serves as the frontend for a robust microservices ecosystem, providing a seamless academic experience for Students, Instructors, and Administrators.
 
