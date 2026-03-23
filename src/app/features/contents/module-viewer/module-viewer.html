@@ -1,0 +1,60 @@
+<div class="container-fluid bg-dark text-white min-vh-100 p-0">
+  <div class="row g-0">
+    
+    <div class="col-lg-9 p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">{{ activeContent()?.title || 'Loading Content...' }}</h4>
+        <button class="btn btn-outline-light btn-sm" [routerLink]="['/programs', programId, 'courses', courseId]">Back to Course</button>
+      </div>
+
+      <div class="ratio ratio-16x9 shadow-lg rounded overflow-hidden bg-black">
+        @if (activeContent()) {
+          <iframe [src]="getSafeUrl(activeContent()!.contentUri)" 
+                  allowfullscreen 
+                  class="border-0">
+          </iframe>
+        } @else {
+          <div class="d-flex align-items-center justify-content-center h-100">
+            <p class="text-muted">Select a lesson to start studying.</p>
+          </div>
+        }
+      </div>
+      
+      <div class="mt-4 p-3 bg-secondary bg-opacity-25 rounded" *ngIf="activeContent()">
+        <h5>About this Lesson</h5>
+        <p class="text-light-50">Type: {{ activeContent()?.contentType }} | Duration: {{ activeContent()?.duration }} mins</p>
+      </div>
+    </div>
+
+    <div class="col-lg-3 bg-white text-dark min-vh-100 shadow">
+      <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Course Content</h5>
+        @if (isEditor()) {
+          <button class="btn btn-primary btn-sm" [routerLink]="['/modules', moduleId, 'add-content']">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        }
+      </div>
+
+      <div class="list-group list-group-flush overflow-auto" style="max-height: 80vh;">
+        @for (item of contents(); track item.contentId) {
+          <div class="list-group-item list-group-item-action p-3" 
+               [class.active]="activeContent()?.contentId === item.contentId"
+               (click)="selectContent(item)" style="cursor: pointer;">
+            <div class="d-flex justify-content-between">
+              <div>
+                <i class="bi" [ngClass]="item.contentType === 'Video' ? 'bi-play-btn' : 'bi-file-earmark-pdf'"></i>
+                <span class="ms-2 small fw-bold">{{ item.title }}</span>
+              </div>
+              @if (isEditor()) {
+                <div (click)="$event.stopPropagation()">
+                  <i class="bi bi-trash text-danger ms-2" (click)="onDelete(item.contentId!)"></i>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

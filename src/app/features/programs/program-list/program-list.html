@@ -1,0 +1,39 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">EduTrack Programs</h2>
+    
+    @if (isEditor()) {
+      <button class="btn btn-success" routerLink="/programs/new">
+        <i class="bi bi-plus-lg"></i> Create New Program
+      </button>
+    }
+  </div>
+  
+  <div class="row g-4">
+    @for (program of programs(); track program.programId) {
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title fw-bold">{{ program.name }}</h5>
+            <p class="card-text text-muted">{{ program.description }}</p>
+          </div>
+          
+          <div class="card-footer bg-transparent border-0 d-flex gap-2 pb-3">
+            <button class="btn btn-primary flex-grow-1" [routerLink]="['/programs', program.programId]" [disabled]="program.status === 'INACTIVE'" >
+              View
+            </button>
+
+            @if (isEditor()) {
+              <button class="btn btn-outline-warning" [routerLink]="['/programs/edit', program.programId]">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-danger" (click)="onDelete(program.programId!)">
+                <i class="bi bi-trash"></i>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

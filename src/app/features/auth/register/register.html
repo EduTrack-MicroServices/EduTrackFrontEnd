@@ -1,0 +1,65 @@
+<div class="container mt-5">
+  <div class="card shadow-sm mx-auto" style="max-width: 550px; border-top: 5px solid #198754;">
+    <div class="card-body p-4">
+      <h2 class="fw-bold mb-4 text-center">Join EduTrack</h2>
+      
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Full Name</label>
+          <input formControlName="userName" class="form-control" placeholder="Enter name"
+                 [class.is-invalid]="registerForm.get('userName')?.touched && registerForm.get('userName')?.invalid">
+          @if (registerForm.get('userName')?.touched && registerForm.get('userName')?.invalid) {
+            <div class="invalid-feedback">Full Name is required.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email</label>
+          <input formControlName="email" type="email" class="form-control" placeholder="Enter email"
+                 [class.is-invalid]="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+          @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+            <div class="invalid-feedback">A valid email address is required.</div>
+          }
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Phone Number</label>
+            <input formControlName="phoneNumber" class="form-control" placeholder="10-digit number"
+                   [class.is-invalid]="registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid">
+            @if (registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid) {
+              <div class="invalid-feedback">Must be exactly 10 digits.</div>
+            }
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Register as:</label>
+            <select formControlName="roleType" class="form-select">
+              <option value="STUDENT">Student</option>
+              <option value="INSTRUCTOR">Instructor</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Password</label>
+          <input formControlName="password" type="password" class="form-control" placeholder="Min 6 characters"
+                 [class.is-invalid]="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+          @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+            <div class="invalid-feedback">Password must be at least 6 characters.</div>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 py-2 fw-bold" [disabled]="registerForm.invalid">
+          Create Account
+        </button>
+
+        <div class="text-center mt-3">
+          <span class="text-muted">Already have an account? </span>
+          <a routerLink="/login" class="text-decoration-none fw-bold">Login here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

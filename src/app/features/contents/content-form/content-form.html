@@ -1,0 +1,103 @@
+<div class="container mt-5 mb-5">
+  <div class="card shadow-lg border-0 mx-auto" style="max-width: 700px; border-radius: 12px;">
+    <div class="card-header bg-primary bg-gradient text-white p-4" style="border-radius: 12px 12px 0 0;">
+      <h4 class="mb-0 d-flex align-items-center">
+        <i class="bi bi-plus-circle-fill me-2"></i> Add Learning Material
+      </h4>
+    </div>
+    
+    <div class="card-body p-4">
+      <form [formGroup]="contentForm" (ngSubmit)="onSubmit()" novalidate>
+        
+        <div class="mb-4">
+          <label class="form-label fw-bold small text-uppercase text-muted">Lesson Title</label>
+          <input type="text" 
+                 formControlName="title" 
+                 class="form-control form-control-lg"
+                 [class.is-invalid]="contentForm.get('title')?.touched && contentForm.get('title')?.invalid"
+                 [class.is-valid]="contentForm.get('title')?.touched && contentForm.get('title')?.valid"
+                 placeholder="e.g. Introduction to Spring Security">
+          
+          <div class="invalid-feedback">
+            @if (contentForm.get('title')?.errors?.['required']) { Title is required. }
+            @if (contentForm.get('title')?.errors?.['minlength']) { Must be at least 3 characters. }
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <label class="form-label fw-bold small text-uppercase text-muted">Material Type</label>
+            <select formControlName="contentType" 
+                    class="form-select"
+                    [class.is-invalid]="contentForm.get('contentType')?.touched && contentForm.get('contentType')?.invalid">
+              <option value="Video">Video (YouTube/Vimeo)</option>
+              <option value="PDF">PDF Document</option>
+              <option value="Slide">Presentation Slides</option>
+              <option value="Lab">Hands-on Lab</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-4">
+            <label class="form-label fw-bold small text-uppercase text-muted">Duration (Mins)</label>
+            <div class="input-group has-validation">
+              <span class="input-group-text bg-light"><i class="bi bi-clock"></i></span>
+              <input type="number" 
+                     formControlName="duration" 
+                     class="form-control"
+                     [class.is-invalid]="contentForm.get('duration')?.touched && contentForm.get('duration')?.invalid">
+              <div class="invalid-feedback">Duration must be at least 1 minute.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-bold small text-uppercase text-muted">Resource URL / URI</label>
+          <div class="input-group has-validation">
+            <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
+            <input type="text" 
+                   formControlName="contentUri" 
+                   class="form-control"
+                   [class.is-invalid]="contentForm.get('contentUri')?.touched && contentForm.get('contentUri')?.invalid"
+                   placeholder="https://www.youtube.com/embed/...">
+            <div class="invalid-feedback">Valid Resource URL is required.</div>
+          </div>
+          <div class="form-text mt-2 bg-light p-2 rounded-2 border-start border-primary border-3">
+            <i class="bi bi-info-circle-fill text-primary me-1"></i> 
+            For YouTube, use the <strong>Embed</strong> format for best compatibility.
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-bold small text-uppercase text-muted d-block">Publication Status</label>
+          <div class="btn-group w-100 shadow-sm" role="group">
+            <input type="radio" class="btn-check" id="published" value="Published" formControlName="status">
+            <label class="btn btn-outline-success py-2" for="published">
+                <i class="bi bi-eye-fill me-1"></i> Published
+            </label>
+
+            <input type="radio" class="btn-check" id="draft" value="Draft" formControlName="status">
+            <label class="btn btn-outline-secondary py-2" for="draft">
+                <i class="bi bi-pencil-square me-1"></i> Draft
+            </label>
+          </div>
+        </div>
+
+        <hr class="my-4 opacity-25">
+
+        <div class="d-grid gap-3">
+          <button type="submit" 
+                  class="btn btn-primary btn-lg fw-bold shadow-sm" 
+                  [disabled]="contentForm.invalid">
+            <i class="bi bi-cloud-arrow-up me-2"></i> Save Learning Material
+          </button>
+          
+          <button type="button" 
+                  class="btn btn-light text-secondary" 
+                  (click)="contentForm.reset()">
+            Discard Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

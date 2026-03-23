@@ -1,0 +1,67 @@
+<div class="container mt-5">
+  <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">{{ isEditMode ? 'Edit Program' : 'Create New Program' }}</h4>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="programForm" (ngSubmit)="onSubmit()">
+        
+        <div class="mb-3">
+          <label class="form-label">Program Name</label>
+          <input formControlName="name" 
+                 class="form-control" 
+                 [class.is-invalid]="programForm.get('name')?.invalid && programForm.get('name')?.touched"
+                 placeholder="e.g. Java Full Stack">
+          @if (programForm.get('name')?.invalid && programForm.get('name')?.touched) {
+            <div class="invalid-feedback">
+              @if (programForm.get('name')?.errors?.['required']) { <span>Name is required.</span> }
+              @if (programForm.get('name')?.errors?.['maxlength']) { <span>Max 100 characters allowed.</span> }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea formControlName="description" 
+                    class="form-control" 
+                    [class.is-invalid]="programForm.get('description')?.invalid && programForm.get('description')?.touched"
+                    rows="3"></textarea>
+          @if (programForm.get('description')?.invalid && programForm.get('description')?.touched) {
+            <div class="invalid-feedback">Description is required.</div>
+          }
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Duration (Weeks)</label>
+            <input type="number" 
+                   formControlName="durationWeeks" 
+                   class="form-control"
+                   [class.is-invalid]="programForm.get('durationWeeks')?.invalid && programForm.get('durationWeeks')?.touched">
+            @if (programForm.get('durationWeeks')?.invalid && programForm.get('durationWeeks')?.touched) {
+              <div class="invalid-feedback">Duration must be at least 1 week.</div>
+            }
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Initial Status</label>
+            <select formControlName="status" 
+                    class="form-select"
+                    [class.is-invalid]="programForm.get('status')?.invalid && programForm.get('status')?.touched">
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end mt-4">
+          <button type="button" class="btn btn-secondary" (click)="programForm.reset()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="programForm.invalid">
+            {{ isEditMode ? 'Update Program' : 'Save Program' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="container mt-5">
+  <div class="card shadow-sm mx-auto" style="max-width: 600px; border-top: 5px solid #0d6efd;">
+    <div class="card-body p-4">
+      <h3 class="fw-bold mb-4">{{ isEditMode ? 'Edit Module' : 'Create New Module' }}</h3>
+      
+      <form [formGroup]="moduleForm" (ngSubmit)="onSubmit()">
+        
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Module Title</label>
+          <input formControlName="name" 
+                 class="form-control form-control-lg" 
+                 [class.is-invalid]="moduleForm.get('name')?.invalid && moduleForm.get('name')?.touched"
+                 placeholder="e.g. Introduction to JPA">
+          @if (moduleForm.get('name')?.invalid && moduleForm.get('name')?.touched) {
+            <div class="invalid-feedback">Module title is required.</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Sequence Order</label>
+          <input type="number" 
+                 formControlName="sequenceOrder" 
+                 class="form-control" 
+                 [class.is-invalid]="moduleForm.get('sequenceOrder')?.invalid && moduleForm.get('sequenceOrder')?.touched"
+                 style="width: 150px;">
+          <div class="form-text">Determines the order of this module in the course.</div>
+          @if (moduleForm.get('sequenceOrder')?.invalid && moduleForm.get('sequenceOrder')?.touched) {
+            <div class="invalid-feedback">Order must be 1 or greater.</div>
+          }
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Learning Objectives</label>
+          <textarea formControlName="learningObjectives" 
+                    class="form-control" 
+                    [class.is-invalid]="moduleForm.get('learningObjectives')?.invalid && moduleForm.get('learningObjectives')?.touched"
+                    rows="5" 
+                    placeholder="What will the student learn?"></textarea>
+          @if (moduleForm.get('learningObjectives')?.invalid && moduleForm.get('learningObjectives')?.touched) {
+            <div class="invalid-feedback">Learning objectives are required for the curriculum.</div>
+          }
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-light border" (click)="moduleForm.reset({sequenceOrder: 1})">Clear</button>
+          <button type="submit" class="btn btn-primary px-4" [disabled]="moduleForm.invalid">
+            {{ isEditMode ? 'Save Changes' : 'Add Module' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
