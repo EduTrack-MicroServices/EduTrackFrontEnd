@@ -1,0 +1,43 @@
+/* Smooth transition for feature cards and hover elements */
+.hover-shadow {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.hover-shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+  border-color: #0d6efd !important; /*Primary border on hover */
+}
+
+/* Premium custom Tab Styling for the Auth card */
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6c757d;
+  border-radius: 0;
+  transition: all 0.2s ease-in-out;
+}
+.nav-tabs .nav-link:hover {
+  border-color: transparent;
+  color: #0d6efd; 
+}
+.nav-tabs .nav-link.active {
+  border-bottom: 3px solid #0d6efd;
+  color: #0d6efd !important;
+  background-color: transparent;
+}
+
+/* Custom Input Focus States */
+.form-control:focus, .form-select:focus {
+  background-color: #fff !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); 
+  border-color: #86b7fe !important;
+}
+
+/* Make sure footer logo blends beautifully */
+.footerLogo {
+  filter: grayscale(100%);
+}
+
+.invalid-feedback.feedbackSmall {
+  font-size: 0.8rem;
+}

@@ -2,10 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth';
 import { SidebarComponent } from './core/components/sidebar/sidebar';
+import { NgxSonnerToaster } from 'ngx-sonner'; // <-- 1. Import Sonner here
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SidebarComponent],
+  // 2. Add NgxSonnerToaster to your imports array
+  imports: [RouterOutlet, SidebarComponent, NgxSonnerToaster], 
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

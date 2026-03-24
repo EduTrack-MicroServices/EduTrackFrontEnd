@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { ApiResponse, LoginResponse, UserResponse } from '../models/auth';
 import { tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
+import { Router } from '@angular/router';
 
 
 
@@ -18,6 +19,7 @@ interface DecodedToken {
 export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8050/api'; 
+  private router=inject(Router)
 
   // Signals for state management
   //userRole = signal<string | null>(localStorage.getItem('role'));
@@ -79,6 +81,8 @@ userRole = signal<string | null>(localStorage.getItem('role') || null);
   logout() {
     localStorage.clear();
     this.userRole.set(null);
+    this.router.navigate(['/home'])
+    
   }
   getUserId(): number {
     const id = localStorage.getItem('userId');
