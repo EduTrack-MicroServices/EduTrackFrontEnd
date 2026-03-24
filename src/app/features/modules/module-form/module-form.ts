@@ -19,7 +19,8 @@ export class ModuleFormComponent implements OnInit {
 
   moduleId: number | null = null;
   courseId: number | null = null;
-  programId: number | null = null;
+    programId: number | null = null;
+
   isEditMode = false;
 
   moduleForm = this.fb.group({
@@ -32,7 +33,6 @@ export class ModuleFormComponent implements OnInit {
     const mId = this.route.snapshot.paramMap.get('moduleId');
     const cId = this.route.snapshot.paramMap.get('courseId');
     this.programId = +this.route.snapshot.paramMap.get('programId')!;
-  
 
     if (mId) {
       this.moduleId = +mId;

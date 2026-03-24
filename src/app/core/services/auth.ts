@@ -4,6 +4,7 @@ import { ApiResponse, LoginResponse, UserResponse } from '../models/auth';
 import { tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 
 
@@ -82,7 +83,8 @@ userRole = signal<string | null>(localStorage.getItem('role') || null);
   logout() {
     localStorage.clear();
     this.userRole.set(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home'])
+    
   }
   getUserId(): number {
     const id = localStorage.getItem('userId');

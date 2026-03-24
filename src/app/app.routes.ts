@@ -13,17 +13,21 @@ import { CourseDetailsComponent } from './features/courses/course-details/course
 import { ModuleFormComponent } from './features/modules/module-form/module-form';
 import { ModuleViewerComponent } from './features/contents/module-viewer/module-viewer';
 import { ContentFormComponent } from './features/contents/content-form/content-form';
+import { HomeComponent } from './features/home/home';
 
 export const routes: Routes = [
     {
         path: 'login', component: LoginComponent
     },
     {
+        path:'home',component:HomeComponent
+    },
+    {
         path: 'register', component: RegisterComponent
     },
     {
         path: 'dashboard', component: DashboardComponent,
-        canActivate: [authGuard]
+          canActivate: [authGuard],
 
     },
     {
@@ -34,7 +38,7 @@ export const routes: Routes = [
     },
     {
         path: 'program-list', component: ProgramListComponent,
-        canActivate: [authGuard]
+        canActivate: [authGuard],
 
     },
 
@@ -89,6 +93,6 @@ export const routes: Routes = [
             component: ContentFormComponent, canActivate: [authGuard]
     },
     {
-        path: '', redirectTo: 'login', pathMatch: 'full'
+        path: '', redirectTo: 'home', pathMatch: 'full'
     }
 ];
