@@ -63,7 +63,7 @@ export class ProgramFormComponent implements OnInit {
         // CREATE Logic
         this.courseService.createProgram(programData).subscribe({
           next: () => this.handleSuccess('Program Created Successfully'),
-          error: (err) => alert(err.error?.message || 'Creation failed')
+          error: (err) => alert(err.error?.errors?.join(', ') || 'Creation failed')
         });
       }
     }

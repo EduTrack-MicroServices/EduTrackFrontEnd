@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/services/auth';
 import { SidebarComponent } from './core/components/sidebar/sidebar';
 
@@ -12,4 +12,7 @@ import { SidebarComponent } from './core/components/sidebar/sidebar';
 export class App {
   // protected readonly title = signal('EduTrackFrontEnd');
   public authService = inject(AuthService);
+   
+
+
 }

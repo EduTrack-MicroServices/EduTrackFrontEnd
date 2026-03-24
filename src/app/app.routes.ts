@@ -22,7 +22,8 @@ export const routes: Routes = [
         path: 'register', component: RegisterComponent
     },
     {
-        path: 'dashboard', component: DashboardComponent
+        path: 'dashboard', component: DashboardComponent,
+        canActivate: [authGuard]
 
     },
     {
@@ -32,7 +33,8 @@ export const routes: Routes = [
         data: { role: 'ADMIN' }
     },
     {
-        path: 'program-list', component: ProgramListComponent
+        path: 'program-list', component: ProgramListComponent,
+        canActivate: [authGuard]
 
     },
 
@@ -68,7 +70,7 @@ export const routes: Routes = [
     },
 
     {
-        path: 'courses/:courseId/add-module',
+        path: 'programs/:programId/courses/:courseId/add-module',
         component: ModuleFormComponent,
         canActivate: [authGuard]
     },

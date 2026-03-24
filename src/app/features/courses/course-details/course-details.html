@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-3 text-end align-self-center">
                 @if(isEditor()) {
-                <button class="btn btn-dark" [routerLink]="['/courses', courseId, 'add-module']">
+                <button class="btn btn-dark" [routerLink]="['/programs',pId,'/courses', courseId, 'add-module']">
                     <i class="bi bi-plus-lg me-2"></i>New Module
                 </button>
                 }
