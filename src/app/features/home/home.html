@@ -1,0 +1,261 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white py-3 border-bottom sticky-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img [ngSrc]="logoPath" width="160" height="40" alt="EduTrack Logo" priority>
+    </a>
+  </div>
+</nav>
+
+<div class="bg-light py-5 border-bottom position-relative">
+  <div class="container py-lg-5">
+    <div class="row align-items-center g-5">
+      
+      <div class="col-lg-6 text-center text-lg-start pe-lg-5">
+        <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3 fw-semibold border border-primary-subtle">
+          Platform v1.0 is now live
+        </div>
+        <h1 class="display-4 fw-bolder mb-4 text-dark" style="letter-spacing: -1px; line-height: 1.1;">
+          The complete system for <span class="text-primary">academic excellence.</span>
+        </h1>
+        <p class="lead text-secondary mb-4 fs-5" style="line-height: 1.6;">
+          EduTrack is a comprehensive, web-based system designed for educational institutions and training organizations to effortlessly manage courses, learners, instructors, assessments, attendance, and learning progress.
+        </p>
+        <div class="d-flex flex-column flex-md-row gap-4 justify-content-center justify-content-lg-start mt-4">
+          <div class="d-flex align-items-center text-muted fw-medium">
+            <i class="bi bi-check2-circle text-success fs-4 me-2"></i> Seamless Course Management
+          </div>
+          <div class="d-flex align-items-center text-muted fw-medium">
+            <i class="bi bi-graph-up-arrow text-success fs-4 me-2"></i> Real-Time Analytics
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 offset-lg-1">
+        <div class="card shadow-lg border-0 rounded-4" style="border-top: 5px solid #0d6efd !important;">
+          <div class="card-header bg-white pt-4 pb-0 border-0">
+            <ul class="nav nav-tabs nav-fill fw-bold" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark py-3" 
+                        [class.active]="activeTab() === 'register'" 
+                        (click)="activeTab.set('register')">
+                  Join EduTrack
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark py-3" 
+                        [class.active]="activeTab() === 'login'" 
+                        (click)="activeTab.set('login')">
+                  Sign In
+                </button>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="card-body p-4 p-sm-5 bg-white">
+            @if (activeTab() === 'register') {
+              <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small text-muted">Full Name</label>
+                  <input formControlName="userName" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="Enter name"
+                         [class.is-invalid]="registerForm.get('userName')?.touched && registerForm.get('userName')?.invalid">
+                  @if (registerForm.get('userName')?.touched && registerForm.get('userName')?.invalid) {
+                    <div class="invalid-feedback feedbackSmall">Full Name is required.</div>
+                  }
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small text-muted">Email</label>
+                  <input formControlName="email" type="email" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="name@example.com"
+                         [class.is-invalid]="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+                  @if (registerForm.get('email')?.touched && registerForm.get('email')?.invalid) {
+                    <div class="invalid-feedback feedbackSmall">A valid email address is required.</div>
+                  }
+                </div>
+
+                <div class="row g-2 mb-3">
+                  <div class="col-sm-6">
+                    <label class="form-label fw-semibold small text-muted">Phone Number</label>
+                    <input formControlName="phoneNumber" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="10-digit number"
+                           [class.is-invalid]="registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid">
+                    @if (registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid) {
+                      <div class="invalid-feedback feedbackSmall">Must be exactly 10 digits.</div>
+                    }
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label fw-semibold small text-muted">Register as:</label>
+                    <select formControlName="roleType" class="form-select form-control-lg bg-light border-0 fs-6 text-dark">
+                      <option value="STUDENT">Student</option>
+                      <option value="INSTRUCTOR">Instructor</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label fw-semibold small text-muted">Password</label>
+                  <input formControlName="password" type="password" class="form-control form-control-lg bg-light border-0 fs-6" placeholder="Min 6 characters"
+                         [class.is-invalid]="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+                  @if (registerForm.get('password')?.touched && registerForm.get('password')?.invalid) {
+                    <div class="invalid-feedback feedbackSmall">Password must be at least 6 characters.</div>
+                  }
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold fs-6" [disabled]="registerForm.invalid">
+                  Create Account
+                </button>
+              </form>
+            }
+
+            @if (activeTab() === 'login') {
+              <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold small text-muted">Email Address</label>
+                  <input formControlName="email" type="email" class="form-control form-control-lg bg-light border-0 fs-6" 
+                         [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+                         placeholder="name@example.com">
+                  @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+                    <div class="invalid-feedback feedbackSmall">Please enter a valid email.</div>
+                  }
+                </div>
+
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between">
+                    <label class="form-label fw-semibold small text-muted">Password</label>
+                  </div>
+                  <input formControlName="password" type="password" class="form-control form-control-lg bg-light border-0 fs-6"
+                         [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+                         placeholder="Enter your password">
+                  @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+                    <div class="invalid-feedback feedbackSmall">Password is required.</div>
+                  }
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold fs-6 mb-3" [disabled]="loginForm.invalid">
+                  Sign in securely
+                </button>
+              </form>
+            }
+          </div>
+          <div class="card-footer bg-light text-center py-3 border-0 rounded-bottom-4">
+            <small class="text-muted">By using EduTrack, you agree to our Terms of Service.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5 my-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bolder">Built for modern learning.</h2>
+    <p class="text-muted fs-5">Explore the core modules powering our comprehensive system.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="p-4 border rounded-4 h-100 bg-white hover-shadow transition-all">
+        <div class="bg-primary bg-opacity-10 d-inline-block p-3 rounded-3 mb-3">
+          <i class="bi bi-book fs-3 text-primary"></i>
+        </div>
+        <h5 class="fw-bold">Course & Curriculum</h5>
+        <p class="text-muted small mb-0">Define programs, courses, modules, and learning objectives effortlessly.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-4 border rounded-4 h-100 bg-white hover-shadow transition-all">
+        <div class="bg-success bg-opacity-10 d-inline-block p-3 rounded-3 mb-3">
+          <i class="bi bi-pencil-square fs-3 text-success"></i>
+        </div>
+        <h5 class="fw-bold">Assessment & Grading</h5>
+        <p class="text-muted small mb-0">Create assessments, capture submissions, grade learners, and provide feedback.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-4 border rounded-4 h-100 bg-white hover-shadow transition-all">
+        <div class="bg-info bg-opacity-10 d-inline-block p-3 rounded-3 mb-3">
+          <i class="bi bi-graph-up-arrow fs-3 text-info"></i>
+        </div>
+        <h5 class="fw-bold">Academic Analytics</h5>
+        <p class="text-muted small mb-0">Track learner progress, completion rates, and analyze academic outcomes.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bg-dark text-white py-5">
+  <div class="container py-5 text-center">
+    <h3 class="fw-bold mb-5">Empowering Every Academic Actor</h3>
+    <div class="row justify-content-center g-4">
+      <div class="col-md-4 px-4 border-end border-secondary">
+        <h5 class="text-primary mb-3"><i class="bi bi-person-badge me-2"></i>Students</h5>
+        <p class="text-white-50 small">Access learning content, submit assignments, and view your grades and progress reports.</p>
+      </div>
+      <div class="col-md-4 px-4 border-end border-secondary">
+        <h5 class="text-success mb-3"><i class="bi bi-person-workspace me-2"></i>Instructors</h5>
+        <p class="text-white-50 small">Upload course content, conduct assessments, and securely evaluate learner performance.</p>
+      </div>
+      <div class="col-md-4 px-4">
+        <h5 class="text-info mb-3"><i class="bi bi-shield-lock me-2"></i>Administrators</h5>
+        <p class="text-white-50 small">Configure academic policies, manage users, and oversee institutional analytics.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white py-5">
+  <div class="container py-5">
+    
+    <div class="mb-5 text-center text-lg-start">
+      <h3 class="fw-bolder mb-3 display-6 text-dark">Reliable, Secure, and Ready to Scale</h3>
+      <p class="text-muted fs-5 col-lg-8 mx-auto mx-lg-0" style="line-height: 1.6;">
+        Whether you are a small training center or a large university, EduTrack provides a robust environment that grows with you, ensuring a smooth, uninterrupted, and secure learning experience for all your users.
+      </p>
+    </div>
+    
+    <div class="row g-4 text-center">
+      
+      <div class="col-6 col-md-3">
+        <div class="p-4 rounded-4 hover-shadow bg-light border h-100 transition-all">
+          <div class="bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-4 shadow-sm" style="width: 85px; height: 85px;">
+            <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
+          </div>
+          <h5 class="fw-bold mb-0">Highly Secure</h5>
+        </div>
+      </div>
+      
+      <div class="col-6 col-md-3">
+        <div class="p-4 rounded-4 hover-shadow bg-light border h-100 transition-all">
+          <div class="bg-info bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-4 shadow-sm" style="width: 85px; height: 85px;">
+            <i class="bi bi-cloud-check text-info" style="font-size: 2.5rem;"></i>
+          </div>
+          <h5 class="fw-bold mb-0">99.9% Uptime</h5>
+        </div>
+      </div>
+      
+      <div class="col-6 col-md-3">
+        <div class="p-4 rounded-4 hover-shadow bg-light border h-100 transition-all">
+          <div class="bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-4 shadow-sm" style="width: 85px; height: 85px;">
+            <i class="bi bi-people-fill text-success" style="font-size: 2.5rem;"></i>
+          </div>
+          <h5 class="fw-bold mb-0">Scalable Platform</h5>
+        </div>
+      </div>
+      
+      <div class="col-6 col-md-3">
+        <div class="p-4 rounded-4 hover-shadow bg-light border h-100 transition-all">
+          <div class="bg-dark bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-4 shadow-sm" style="width: 85px; height: 85px;">
+            <i class="bi bi-lock-fill text-dark" style="font-size: 2.5rem;"></i>
+          </div>
+          <h5 class="fw-bold mb-0">Data Privacy</h5>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="bg-light text-center py-5 border-top">
+  <div class="container py-2">
+    <img [ngSrc]="logoPath" width="130" height="32" alt="EduTrack Logo" class="mb-3 footerLogo opacity-75">
+    <p class="text-muted small mb-0">&copy; 2026-2028 EduTrack Platform. All rights reserved.</p>
+  </div>
+</footer>

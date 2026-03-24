@@ -17,7 +17,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         
         // Clear everything so the app doesn't try to use the bad token again
         authService.logout(); 
-        router.navigate(['/login']);
+        // router.navigate(['/login']);
       }
       
       // Pass the error along to the component if it needs to show a specific message

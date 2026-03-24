@@ -41,4 +41,8 @@ export class EnrollmentService {
   getEnrollmentsByProgram(programId: number) {
     return this.http.get<ApiResponse<EnrollmentResponse[]>>(`${this.baseUrl}/by-Program/${programId}`);
   }
+
+ getAllEnrollments() {
+    return this.http.get<ApiResponse<EnrollmentResponse[]>>(`${this.baseUrl}/getAll`);
+  }
 }
