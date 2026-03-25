@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Module } from '../../../core/models/course';
 import { CourseService } from '../../../core/services/course-service';
 import { CommonModule } from '@angular/common';
+import { toast } from 'ngx-sonner'; // <-- Import Sonner toast
 
 @Component({
   selector: 'app-module-form',
@@ -19,7 +20,7 @@ export class ModuleFormComponent implements OnInit {
 
   moduleId: number | null = null;
   courseId: number | null = null;
-    programId: number | null = null;
+  programId: number | null = null;
 
   isEditMode = false;
 
@@ -44,8 +45,13 @@ export class ModuleFormComponent implements OnInit {
   }
 
   loadModuleData(id: number) {
-    this.courseService.getModuleById(id).subscribe(res => {
-      if (res.success) this.moduleForm.patchValue(res.data);
+    this.courseService.getModuleById(id).subscribe({
+      next: (res) => {
+        if (res.success) this.moduleForm.patchValue(res.data);
+      },
+      error: () => {
+        toast.error('Failed to load module details');
+      }
     });
   }
 
@@ -56,24 +62,38 @@ export class ModuleFormComponent implements OnInit {
       if (this.isEditMode && this.moduleId) {
         // UPDATE: PUT /api/modules/{moduleId}
         this.courseService.updateModule(this.moduleId, moduleData).subscribe({
-          next: () => this.handleSuccess('Module updated successfully'),
-          error: (err) => alert(err.error?.message || 'Update failed')
+          next: () => this.handleSuccess('Module updated successfully!'),
+          error: (err) => {
+            const backendErrors = err.error?.errors || err.error?.message;
+            const errorMessage = Array.isArray(backendErrors) ? backendErrors.join(', ') : (backendErrors || 'Update failed');
+            toast.error('Failed to update module', { description: errorMessage });
+          }
         });
       } else if (this.courseId) {
         // CREATE: POST /api/courses/{courseId}/modules
         this.courseService.addModule(this.courseId, moduleData).subscribe({
-          next: () => this.handleSuccess('Module added to course'),
-          error: (err) => alert(err.error?.message || 'Creation failed')
+          next: () => this.handleSuccess('Module added to course!'),
+          error: (err) => {
+            const backendErrors = err.error?.errors || err.error?.message;
+            const errorMessage = Array.isArray(backendErrors) ? backendErrors.join(', ') : (backendErrors || 'Creation failed');
+            toast.error('Failed to create module', { description: errorMessage });
+          }
         });
       }
+    } else {
+      // Form Validation Fallback
+      toast.warning('Invalid Form', { 
+        description: 'Please ensure all required fields are filled out correctly.' 
+      });
     }
   }
 
   private handleSuccess(msg: string) {
-    alert(msg);
+    toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
+    
     // If we have courseId, go back to course details, otherwise go to dashboard
     if (this.courseId) {
-      this.router.navigate(['/programs',this.programId, 'courses', this.courseId]);
+      this.router.navigate(['/programs', this.programId, 'courses', this.courseId]);
     } else {
       window.history.back(); // Simple way to return to previous page
     }

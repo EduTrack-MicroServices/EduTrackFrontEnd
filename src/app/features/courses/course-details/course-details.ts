@@ -6,6 +6,7 @@ import { CourseService } from '../../../core/services/course-service';
 import { CommonModule } from '@angular/common';
 import { EnrollmentService } from '../../../core/services/enrollment-service';
 import { AssessmentService } from '../../../core/services/assessment-service';
+import { toast } from 'ngx-sonner'; // <-- Import Sonner toast
 
 @Component({
   selector: 'app-course-details',
@@ -106,11 +107,36 @@ export class CourseDetailsComponent implements OnInit {
   }
 
   onDeleteModule(moduleId: number) {
-    if (confirm('Are you sure you want to delete this module?')) {
-      this.courseService.deleteModule(moduleId).subscribe(() => {
-        alert('Module removed successfully');
-        this.loadCourseAndModules();
-      });
-    }
+    // Action Toast replacing the confirm() dialog
+    toast.warning('Delete this module?', {
+      description: 'Are you sure? This action cannot be undone.',
+      action: {
+        label: 'Delete',
+        onClick: () => {
+          // Execute deletion only if they click the Delete action inside the toast
+          this.courseService.deleteModule(moduleId).subscribe({
+            next: () => {
+              // Success Toast replacing the alert()
+              toast.success('Module removed successfully', {
+                duration: 3000
+              });
+              this.loadCourseAndModules();
+            },
+            error: (err) => {
+              toast.error('Failed to delete module', {
+                description: err.error?.message || 'An error occurred.',
+                duration: 4000
+              });
+            }
+          });
+        }
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {
+          // Optional: Do nothing, just close the toast
+        }
+      }
+    });
   }
 }

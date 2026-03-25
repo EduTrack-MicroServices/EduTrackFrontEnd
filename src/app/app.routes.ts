@@ -18,6 +18,7 @@ import { AssessmentTakeComponent } from './features/assessment/assessment-take/a
 import { AssessmentViewComponent } from './features/assessment/assessment-view/assessment-view';
 import { AssessmentCreateComponent } from './features/assessment/assessment-create/assessment-create';
 import { HomeComponent } from './features/home/home';
+import { Analysispage } from './features/analysispage/analysispage';
 
 export const routes: Routes = [
     {
@@ -56,6 +57,13 @@ export const routes: Routes = [
         component: ProgramFormComponent,
         canActivate: [authGuard, roleGuard],
         data: { role: 'INSTRUCTOR' }
+    },
+    {
+        path:'analysispage',
+        component:Analysispage,
+        canActivate: [authGuard, roleGuard],
+        data:{role:'STUDENT'}
+
     },
 
     {
