@@ -19,6 +19,8 @@ export class ModuleFormComponent implements OnInit {
 
   moduleId: number | null = null;
   courseId: number | null = null;
+    programId: number | null = null;
+
   isEditMode = false;
 
   moduleForm = this.fb.group({
@@ -30,6 +32,7 @@ export class ModuleFormComponent implements OnInit {
   ngOnInit() {
     const mId = this.route.snapshot.paramMap.get('moduleId');
     const cId = this.route.snapshot.paramMap.get('courseId');
+    this.programId = +this.route.snapshot.paramMap.get('programId')!;
 
     if (mId) {
       this.moduleId = +mId;
@@ -70,7 +73,7 @@ export class ModuleFormComponent implements OnInit {
     alert(msg);
     // If we have courseId, go back to course details, otherwise go to dashboard
     if (this.courseId) {
-      this.router.navigate(['/courses', this.courseId]);
+      this.router.navigate(['/programs',this.programId, 'courses', this.courseId]);
     } else {
       window.history.back(); // Simple way to return to previous page
     }

@@ -17,16 +17,21 @@ import { AssessmentScoreComponent } from './features/assessment/assessment-score
 import { AssessmentTakeComponent } from './features/assessment/assessment-take/assessment-take';
 import { AssessmentViewComponent } from './features/assessment/assessment-view/assessment-view';
 import { AssessmentCreateComponent } from './features/assessment/assessment-create/assessment-create';
+import { HomeComponent } from './features/home/home';
 
 export const routes: Routes = [
     {
         path: 'login', component: LoginComponent
     },
     {
+        path:'home',component:HomeComponent
+    },
+    {
         path: 'register', component: RegisterComponent
     },
     {
-        path: 'dashboard', component: DashboardComponent
+        path: 'dashboard', component: DashboardComponent,
+          canActivate: [authGuard],
 
     },
     {
@@ -36,7 +41,8 @@ export const routes: Routes = [
         data: { role: 'ADMIN' }
     },
     {
-        path: 'program-list', component: ProgramListComponent
+        path: 'program-list', component: ProgramListComponent,
+        canActivate: [authGuard],
 
     },
 
@@ -70,13 +76,13 @@ export const routes: Routes = [
         component: CourseDetailsComponent, canActivate: [authGuard],
     
     },
-{
+    {
         path: 'courses/:courseId',
         component: CourseDetailsComponent,
         canActivate: [authGuard]
     },
     {
-        path: 'courses/:courseId/add-module',
+        path: 'programs/:programId/courses/:courseId/add-module',
         component: ModuleFormComponent,
         canActivate: [authGuard]
     },
@@ -107,6 +113,18 @@ export const routes: Routes = [
   path: 'courses/:courseId/assessment/score',component: AssessmentScoreComponent
 },
     {
-        path: '', redirectTo: 'login', pathMatch: 'full'
+  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
+},
+{
+  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
+},
+{
+  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
+},
+{
+  path: 'courses/:courseId/assessment/score',component: AssessmentScoreComponent
+},
+    {
+        path: '', redirectTo: 'home', pathMatch: 'full'
     }
 ];
