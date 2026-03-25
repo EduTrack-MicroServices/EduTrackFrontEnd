@@ -77,10 +77,9 @@ export class AssessmentService {
   getQuizQuestions(
     courseId: number,
     size: number = 10,
-    includeAnswers: boolean = true,
   ): Observable<any> {
     return this.http.get(
-      `${this.baseUrl}/quiz/course/${courseId}?size=${size}&includeAnswers=${includeAnswers}`,
+      `${this.baseUrl}/quiz/course/${courseId}?size=${size}`,
     );
   }
 
