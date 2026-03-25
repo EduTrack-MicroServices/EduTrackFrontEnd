@@ -100,14 +100,14 @@
                 <td>
                   <span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center shadow-sm" 
                     [ngClass]="{
-                      'badge-glass-pending': user.accountStatus?.toUpperCase() === 'PENDING' || !user.accountStatus,
-                      'badge-glass-success': user.accountStatus?.toUpperCase() === 'APPROVED' || user.accountStatus?.toUpperCase() === 'ACTIVE',
-                      'badge-glass-danger': user.accountStatus?.toUpperCase() === 'REJECTED'
+                      'badge-glass-pending': user.accountStatus.toUpperCase() === 'PENDING',
+                      'badge-glass-success': user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE',
+                      'badge-glass-danger': user.accountStatus.toUpperCase() === 'REJECTED'
                     }">
                     <i class="me-2" style="font-size: 0.85rem;" [ngClass]="{
-                      'bi bi-hourglass-split': user.accountStatus?.toUpperCase() === 'PENDING' || !user.accountStatus,
-                      'bi bi-check-circle-fill': user.accountStatus?.toUpperCase() === 'APPROVED' || user.accountStatus?.toUpperCase() === 'ACTIVE',
-                      'bi bi-x-circle-fill': user.accountStatus?.toUpperCase() === 'REJECTED'
+                      'bi bi-hourglass-split': user.accountStatus.toUpperCase() === 'PENDING',
+                      'bi bi-check-circle-fill': user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE',
+                      'bi bi-x-circle-fill': user.accountStatus.toUpperCase() === 'REJECTED'
                     }"></i>
                     {{ (user.accountStatus || 'Pending') | uppercase }}
                   </span>
@@ -117,7 +117,7 @@
                   @if (user.role === 'INSTRUCTOR') {
                     <div class="d-flex justify-content-center gap-2">
                       
-                      @if (user.accountStatus?.toUpperCase() === 'PENDING' || !user.accountStatus) {
+                      @if (user.accountStatus.toUpperCase() === 'PENDING') {
                         <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
                           <i class="bi bi-check-lg me-1"></i> Accept
                         </button>
@@ -126,13 +126,13 @@
                         </button>
                       } 
                       
-                      @else if (user.accountStatus?.toUpperCase() === 'APPROVED' || user.accountStatus?.toUpperCase() === 'ACTIVE') {
+                      @else if (user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE') {
                         <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" (click)="rejectInstructor(user.email)">
                           <i class="bi bi-x-lg me-1"></i> Reject
                         </button>
                       } 
                       
-                      @else if (user.accountStatus?.toUpperCase() === 'REJECTED') {
+                      @else if (user.accountStatus.toUpperCase() === 'REJECTED') {
                         <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
                           <i class="bi bi-check-lg me-1"></i> Accept
                         </button>

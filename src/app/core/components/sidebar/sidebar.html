@@ -47,7 +47,7 @@
       </a>
     }
 
-    @if (userRole() === 'ADMIN' || userRole() === 'INSTRUCTOR') {
+    @if (userRole() === 'ADMIN') {
       @if (!isCollapsed()) { <p class="nav-label mt-4">Management</p> }
       <a routerLink="/admin-dashboard" routerLinkActive="active" class="nav-pill">
         <i class="bi bi-shield-lock-fill nav-icon"></i>

@@ -18,24 +18,19 @@
     <div class="bento-item skeleton-box" style="height: 400px; grid-column: span 4;"></div>
   </div>
 
-
   <div *ngIf="!isLoading() && submissions().length === 0" class="d-flex flex-column align-items-center justify-content-center text-center py-5 my-5 fade-in-up">
-    
     <div class="mb-4 position-relative">
       <div class="position-absolute top-50 start-50 translate-middle bg-slate rounded-circle" style="width: 140px; height: 140px; z-index: -1;"></div>
       <i class="bi bi-journal-x text-indigo" style="font-size: 5rem;"></i>
     </div>
-    
     <h2 class="fw-bolder text-dark mb-3 mt-3">No Assessments Yet</h2>
     <p class="text-muted fs-5 mb-5" style="max-width: 550px;">
       Your performance footprint is waiting! Complete your first module quiz or course assignment to unlock your personalized learning analytics.
     </p>
-    
     <a routerLink="/program-list" class="btn rounded-pill px-5 py-3 fw-bold shadow-sm hover-elevate text-white fs-5 d-flex align-items-center gap-2" style="background-color:rgba(0, 0, 255, 0.911);">
-      <i class="bi bi-rocket-takeoff]"></i> Start Learning
+      <i class="bi bi-rocket-takeoff"></i> Start Learning
     </a>
   </div>
-
 
   <div *ngIf="!isLoading() && submissions().length > 0" class="fade-in-up">
     
@@ -103,7 +98,7 @@
           <table class="table table-hover align-middle mb-0 modern-table">
             <thead class="bg-slate">
               <tr>
-                <th class="ps-4 py-3 text-muted fw-semibold text-uppercase tracking-wide small border-0">Assessment</th>
+                <th class="ps-4 py-3 text-muted fw-semibold text-uppercase tracking-wide small border-0">Assessment & Course</th>
                 <th class="py-3 text-muted fw-semibold text-uppercase tracking-wide small border-0">Submitted On</th>
                 <th class="py-3 text-muted fw-semibold text-uppercase tracking-wide small border-0">Result</th>
                 <th class="py-3 text-muted fw-semibold text-uppercase tracking-wide small border-0 pe-4">Instructor Note</th>
@@ -114,10 +109,13 @@
                 <td class="ps-4 py-4">
                   <div class="d-flex align-items-center gap-3">
                     <div class="icon-micro bg-light rounded text-secondary"><i class="bi bi-file-earmark-code"></i></div>
-                    <span class="fw-bold text-dark">ASM-{{ sub.assessmentId | number:'3.0' }}</span>
+                    <div>
+                      <span class="fw-bold text-dark d-block">{{ sub.courseName }}</span>
+                      <small class="text-muted">ID: ASM-{{ sub.assessmentId | number:'3.0' }}</small>
+                    </div>
                   </div>
                 </td>
-                <td class="py-4 text-secondary fw-medium">{{ sub.submittedDate | date:'MMM dd, yyyy - shortTime' }}</td>
+                <td class="py-4 text-secondary fw-medium">{{ sub.submittedDate | date:'MMM dd, yyyy' }}</td>
                 <td class="py-4">
                   <div class="d-flex align-items-center gap-2">
                     <div class="score-ring" [style.background]="'conic-gradient(' + (sub.score >= 8 ? '#10b981' : sub.score >= 5 ? '#f59e0b' : '#ef4444') + ' ' + (sub.score * 10) + '%, #e2e8f0 0)'"></div>
@@ -126,7 +124,7 @@
                 </td>
                 <td class="py-4 pe-4">
                   <p class="mb-0 text-secondary text-truncate" style="max-width: 350px;" [title]="sub.feedback">
-                    {{ sub.feedback || 'Awaiting evaluation...' }}
+                    {{ sub.feedback || 'Success! Core competencies met.' }}
                   </p>
                 </td>
               </tr>
