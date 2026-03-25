@@ -1,0 +1,20 @@
+<div class="container mt-5">
+
+  <div class="card shadow-sm mx-auto text-center" style="max-width: 450px;">
+    <div class="card-header bg-dark text-white p-3">
+      <h4>Your Score</h4>
+    </div>
+
+    <div class="card-body p-4">
+      <h1 class="display-4">{{ score }}/{{ total }}</h1>
+
+      <p class="mt-3 fs-5">
+        {{ score === total ? 'Perfect Score!' : 'Well done!' }}
+      </p>
+
+      <a routerLink="/dashboard" class="btn btn-primary mt-3">Go Back</a>
+    </div>
+
+  </div>
+
+</div>

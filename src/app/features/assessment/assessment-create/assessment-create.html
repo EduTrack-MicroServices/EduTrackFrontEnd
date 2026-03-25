@@ -1,0 +1,97 @@
+<div class="container mt-5 pb-5">
+
+  <div class="card shadow-sm mx-auto mb-4" style="max-width: 750px;">
+    <div class="card-header bg-dark text-white p-3">
+      <h4 class="mb-0">Create Quiz Assessment</h4>
+    </div>
+    <div class="card-body p-4">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold">No. of Questions (Max: {{questionCount}})</label>
+          <input type="number" 
+                 class="form-control" 
+                 [(ngModel)]="assessment.numberOfQuestions" 
+                 (input)="checkMaxQuestions()" 
+                 [max]="questionCount">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold">Total Marks</label>
+          <input type="number" class="form-control" [value]="assessment.maxMarks" disabled>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Due Date</label>
+        <input type="date" class="form-control" [(ngModel)]="assessment.dueDate">
+      </div>
+
+      @if(errorMessage && !newQuestion.question) {
+        <div class="alert alert-danger">{{ errorMessage }}</div>
+      }
+
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-success px-5" (click)="createAssessment()">Save Assessment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mx-auto mb-4" style="max-width: 750px;">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Add New Question to Bank</h5>
+    </div>
+    <div class="card-body">
+      <div class="mb-3">
+        <label class="form-label fw-bold small text-uppercase">Question</label>
+        <textarea class="form-control" rows="2" [(ngModel)]="newQuestion.question" placeholder="Enter question text..."></textarea>
+      </div>
+
+      <div class="row g-2">
+        <div class="col-6"><input type="text" class="form-control" placeholder="Option 1" [(ngModel)]="newQuestion.option1"></div>
+        <div class="col-6"><input type="text" class="form-control" placeholder="Option 2" [(ngModel)]="newQuestion.option2"></div>
+        <div class="col-6"><input type="text" class="form-control" placeholder="Option 3" [(ngModel)]="newQuestion.option3"></div>
+        <div class="col-6"><input type="text" class="form-control" placeholder="Option 4" [(ngModel)]="newQuestion.option4"></div>
+      </div>
+
+      <div class="mt-3">
+        <label class="form-label fw-bold small text-uppercase">Select Correct Answer</label>
+        <select class="form-select" [(ngModel)]="newQuestion.answer">
+          <option value="">-- Choose Answer --</option>
+          @if(newQuestion.option1){ <option [value]="newQuestion.option1">Option 1: {{newQuestion.option1}}</option> }
+          @if(newQuestion.option2){ <option [value]="newQuestion.option2">Option 2: {{newQuestion.option2}}</option> }
+          @if(newQuestion.option3){ <option [value]="newQuestion.option3">Option 3: {{newQuestion.option3}}</option> }
+          @if(newQuestion.option4){ <option [value]="newQuestion.option4">Option 4: {{newQuestion.option4}}</option> }
+        </select>
+      </div>
+
+      @if(errorMessage && newQuestion.question) {
+        <div class="alert alert-danger mt-3 py-2 small">{{ errorMessage }}</div>
+      }
+
+      <button class="btn btn-outline-primary w-100 mt-3 fw-bold" (click)="addQuestionToBank()">
+        ADD TO BANK
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mx-auto" style="max-width: 750px;">
+    <div class="card-header bg-light d-flex justify-content-between">
+      <h5 class="mb-0">Bank Questions ({{ questionCount }})</h5>
+    </div>
+    <div class="card-body">
+      @for (q of questions; track q.questionId) {
+        <div class="d-flex justify-content-between align-items-start border-bottom py-3">
+          <div>
+            <div class="fw-bold">{{ q.question }}</div>
+            <div class="small text-success mt-1">Correct: {{ q.answer }}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" (click)="deleteQuestion(q.questionId)">
+            Delete
+          </button>
+        </div>
+      } @empty {
+        <div class="text-center text-muted p-4">No questions found for this course.</div>
+      }
+    </div>
+  </div>
+
+</div>
