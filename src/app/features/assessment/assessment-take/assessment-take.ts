@@ -68,24 +68,36 @@ export class AssessmentTakeComponent implements OnInit {
       this.questions.length > 0 && Object.keys(this.userAnswers).length === this.questions.length
     );
   }
+  private generateFeedback(score: number, total: number): string {
+    const percentage = (score / total) * 100;
 
-  // Inside AssessmentTakeComponent class
+    if (percentage < 40) {
+      return 'Bad, need to improve. Please review the course materials and try again.';
+    } else if (percentage >= 40 && percentage < 70) {
+      return 'Good, but there is still scope for improvement. Well done on passing!';
+    } else if (percentage >= 70 && percentage < 90) {
+      return 'Great job! You have a strong grasp of the material.';
+    } else {
+      return 'Excellent! You have mastered this course perfectly.';
+    }
+  }
+
   submitQuiz() {
     if (!this.isQuizComplete) {
       this.errorMessage = 'Please answer all mandatory questions.';
       return;
     }
 
-    // 1. Get User ID from Local Storage (fallback to auth service if needed)
     const userId = Number(localStorage.getItem('userId')) || this.auth.getUserId();
 
     if (!userId) {
-      this.errorMessage = "User session not found. Please log in again.";
+      this.errorMessage = 'User session not found. Please log in again.';
       return;
     }
 
-    // 2. Calculate score and build review data
     let totalPoints = 0;
+    const totalQuestions = this.questions.length;
+
     const reviewData = this.questions.map((q) => {
       const isCorrect = this.userAnswers[q.questionId] === q.answer;
       if (isCorrect) totalPoints++;
@@ -97,61 +109,57 @@ export class AssessmentTakeComponent implements OnInit {
       };
     });
 
-    // 3. Prepare payload
+    // 2. Generate the dynamic feedback string
+    const dynamicFeedback = this.generateFeedback(totalPoints, totalQuestions);
+
+    // 3. Prepare payload with the dynamic feedback
     const submissionData = {
       assessmentId: this.assessmentId,
       userId: userId,
       submittedDate: new Date().toISOString(),
       score: totalPoints,
-      feedback: `Attempt updated for Course ID: ${this.courseId}`,
+      feedback: dynamicFeedback, // Now contains the score-based message
     };
 
     // 4. Logic: Find existing submission first
     this.api.checkSubmission(userId, this.assessmentId).subscribe({
       next: (res: any) => {
-        // If success is true and data exists, the user has submitted before
         if (res.success && res.data) {
           const existingSubmissionId = res.data.submissionId;
-          
+
           this.api.updateSubmission(existingSubmissionId, submissionData).subscribe({
-            next: () => this.navigateToResult(totalPoints, reviewData),
-            error: () => this.errorMessage = "Failed to update existing submission."
+            next: () => this.navigateToResult(totalPoints, reviewData, dynamicFeedback),
+            error: () => (this.errorMessage = 'Failed to update existing submission.'),
           });
         } else {
-          // If 200 OK but no data, create a new one
-          this.createNewSubmission(submissionData, totalPoints, reviewData);
+          this.createNewSubmission(submissionData, totalPoints, reviewData, dynamicFeedback);
         }
       },
       error: (err) => {
-        // If 404/Error, it means no previous record exists
-        this.createNewSubmission(submissionData, totalPoints, reviewData);
-      }
+        this.createNewSubmission(submissionData, totalPoints, reviewData, dynamicFeedback);
+      },
     });
   }
 
-  // Helper: Logic for creating a new record
-  private createNewSubmission(data: any, score: number, review: any[]) {
+  private createNewSubmission(data: any, score: number, review: any[], feedback: string) {
     this.api.createSubmission(data).subscribe({
-      next: () => this.navigateToResult(score, review),
-      error: () => this.errorMessage = "Failed to save submission."
+      next: () => this.navigateToResult(score, review, feedback),
+      error: () => (this.errorMessage = 'Failed to save submission.'),
     });
   }
 
-  // Helper: Navigation logic
- // Inside AssessmentTakeComponent.ts
-
-private navigateToResult(score: number, review: any[]) {
-  this.router.navigate(['/courses', this.courseId, 'assessment', 'result'], {
-    // replaceUrl: true prevents the user from going "Back" into the quiz
-    replaceUrl: true, 
-    state: {
-      score: score,
-      total: this.questions.length,
-      passed: score >= (this.questions.length * 0.4),
-      review: review
-    },
-  });
-}
+  private navigateToResult(score: number, review: any[], feedback: string) {
+    this.router.navigate(['/courses', this.courseId, 'assessment', 'result'], {
+      replaceUrl: true,
+      state: {
+        score: score,
+        total: this.questions.length,
+        passed: score >= this.questions.length * 0.4,
+        review: review,
+        feedback: feedback, // Pass it to the result page to display there too
+      },
+    });
+  }
   // Inside your AssessmentTakeComponent class
 
   /** Returns the number of questions answered so far */
