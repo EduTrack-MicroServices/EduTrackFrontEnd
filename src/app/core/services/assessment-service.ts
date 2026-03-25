@@ -3,10 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AssessmentService {
-
   private baseUrl = 'http://localhost:8050/api';
 
   constructor(private http: HttpClient) {}
@@ -37,6 +36,7 @@ export class AssessmentService {
   deleteAssessment(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/assessment/${id}`);
   }
+ 
 
   // ============================================================
   // QUESTION APIs
@@ -77,10 +77,10 @@ export class AssessmentService {
   getQuizQuestions(
     courseId: number,
     size: number = 10,
-    includeAnswers: boolean = true
+    includeAnswers: boolean = true,
   ): Observable<any> {
     return this.http.get(
-      `${this.baseUrl}/quiz/course/${courseId}?size=${size}&includeAnswers=${includeAnswers}`
+      `${this.baseUrl}/quiz/course/${courseId}?size=${size}&includeAnswers=${includeAnswers}`,
     );
   }
 
@@ -107,6 +107,9 @@ export class AssessmentService {
   deleteSubmission(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/submission/${id}`);
   }
+   checkSubmission(userId: number, assessmentId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/submission/checkSubmission/${userId}/assessment/${assessmentId}`);
+  }
 
   // ------------------ ANALYTICS ------------------
 
@@ -123,8 +126,6 @@ export class AssessmentService {
   }
 
   getStudentAverageByProgram(userId: number, programId: number): Observable<any> {
-    return this.http.get(
-      `${this.baseUrl}/analysis/student/${userId}/program/${programId}`
-    );
+    return this.http.get(`${this.baseUrl}/analysis/student/${userId}/program/${programId}`);
   }
 }

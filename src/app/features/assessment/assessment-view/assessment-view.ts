@@ -2,15 +2,15 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AssessmentService } from '../../../core/services/assessment-service';
 import { Assessment } from '../../../core/models/assessment';
+import { Submission } from '../../../core/models/submission';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../core/services/auth'; // Ensure path is correct
+import { AuthService } from '../../../core/services/auth'; 
 
 @Component({
   standalone: true,
   selector: 'app-assessment-view',
   imports: [CommonModule, RouterLink], 
-  templateUrl: './assessment-view.html',
-  styleUrls: ['./assessment-view.css'] // Optional: for custom styling
+  templateUrl: './assessment-view.html'
 })
 export class AssessmentViewComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -21,29 +21,64 @@ export class AssessmentViewComponent implements OnInit {
   courseId!: number;
   assessment: Assessment | null = null;
   isLoading = true;
+  isAlreadySubmitted = false;
+  submissionData: Submission | null = null;
 
-  // Check if current user is an instructor/admin
   isEditor = (): boolean => {
     const role = this.authService.userRole();
     return role === 'ADMIN' || role === 'INSTRUCTOR';
   };
-ngOnInit(): void {
-  const idParam = this.route.snapshot.paramMap.get('courseId');
-  this.courseId = Number(idParam);
 
-  // Calling the specific endpoint for this course
-  this.api.getAssessmentByCourseId(this.courseId).subscribe({
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('courseId');
+    this.courseId = Number(idParam);
+
+    const storedUserId = localStorage.getItem('userId');
+    const userId = storedUserId ? Number(storedUserId) : null;
+
+    // 1. Fetch Assessment Details
+    this.api.getAssessmentByCourseId(this.courseId).subscribe({
+      next: (res: any) => {
+        this.assessment = res?.data || res;
+        
+        if (this.assessment && !this.isEditor() && userId) {
+          // 2. Verify if student has already submitted
+          this.verifyUserSubmission(userId, this.assessment.assessmentId);
+        } else {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Error loading assessment:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private verifyUserSubmission(userId: number, assessmentId: number) {
+  this.api.checkSubmission(userId, assessmentId).subscribe({
     next: (res: any) => {
-      // Check if data is wrapped in a 'data' property or returned directly
-      this.assessment = res?.data ? res.data : res;
-      
-      console.log('Assessment Loaded:', this.assessment);
-      this.isLoading = false; 
-      this.cdr.detectChanges(); // Ensures UI updates immediately
+      // res is your ApiResponse DTO
+      if (res.success && res.data) {
+        // If your backend returns a single object or a list of submissions:
+        // We'll treat it as a single object for the "Latest" view 
+        // and you can loop it if it's a list for history.
+        this.submissionData = res.data;
+        this.isAlreadySubmitted = true;
+      } else {
+        // success: false or data: null (e.g., 404 handled within a 200 OK)
+        this.isAlreadySubmitted = false;
+        this.submissionData = null;
+      }
+      this.isLoading = false;
+      this.cdr.detectChanges();
     },
     error: (err) => {
-      console.error('Error loading assessment', err);
-      this.assessment = null; // Ensure state is clean on error
+      // Catches actual HTTP errors (400, 404, 500)
+      this.isAlreadySubmitted = false;
+      this.submissionData = null;
       this.isLoading = false;
       this.cdr.detectChanges();
     }

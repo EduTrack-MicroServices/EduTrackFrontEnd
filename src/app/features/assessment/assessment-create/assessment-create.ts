@@ -1,53 +1,61 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AssessmentService } from '../../../core/services/assessment-service';
 
 @Component({
   selector: 'app-assessment-create',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './assessment-create.html'
 })
 export class AssessmentCreateComponent implements OnInit {
   courseId!: number;
   questions: any[] = [];
   questionCount = 0;
-  errorMessage = '';
+  
+  // Error handling states
+  bankMessage = '';       // For "need more questions" logic
+  serverErrorMessage = ''; // For backend validation (e.g., past date)
 
-  // Data model for adding a new question (matching your Java Entity)
-  newQuestion = {
-    courseId: 0,
-    question: '',
-    option1: '',
-    option2: '',
-    option3: '',
-    option4: '',
-    answer: ''
-  };
+  readonly REQUIRED_COUNT = 10;
 
-  // Data model for the Assessment itself
-  assessment = {
-    courseId: 0,
-    type: 'QUIZ',
-    numberOfQuestions: 0,
-    maxMarks: 0,
-    dueDate: '',
-    status: 'ASSIGNED'
-  };
+  // Assessment Form - Static values are 'disabled' so they can't be edited
+  assessmentForm = new FormGroup({
+    courseId: new FormControl(0),
+    type: new FormControl('QUIZ'),
+    numberOfQuestions: new FormControl({ value: 10, disabled: true }),
+    maxMarks: new FormControl({ value: 10, disabled: true }),
+    dueDate: new FormControl('', [Validators.required]),
+    status: new FormControl('ASSIGNED')
+  });
+
+  // Question Form
+  questionForm = new FormGroup({
+    courseId: new FormControl(0),
+    question: new FormControl('', Validators.required),
+    option1: new FormControl('', Validators.required),
+    option2: new FormControl('', Validators.required),
+    option3: new FormControl(''),
+    option4: new FormControl(''),
+    answer: new FormControl('', Validators.required)
+  });
 
   constructor(
     private route: ActivatedRoute,
     private api: AssessmentService,
     private router: Router,
-    private cdr: ChangeDetectorRef // Injected to fix UI refresh issue
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.courseId = Number(this.route.snapshot.paramMap.get('courseId'));
-    this.assessment.courseId = this.courseId;
-    this.newQuestion.courseId = this.courseId;
+    
+    // Initialize forms with current course context
+    this.assessmentForm.patchValue({ courseId: this.courseId });
+    this.questionForm.patchValue({ courseId: this.courseId });
+
     this.loadQuestions();
   }
 
@@ -56,85 +64,58 @@ export class AssessmentCreateComponent implements OnInit {
       next: (res: any) => {
         this.questions = res.data || [];
         this.questionCount = this.questions.length;
-        
-        // This forces Angular to refresh the UI immediately
-        this.cdr.detectChanges(); 
+        this.updateBankStatus();
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error fetching questions:', err);
-      }
+      error: (err) => console.error('Bank Load Error:', err)
     });
   }
 
-  // VALIDATION: Prevents selecting more questions than available
-  checkMaxQuestions() {
-    if (this.assessment.numberOfQuestions > this.questionCount) {
-      this.assessment.numberOfQuestions = this.questionCount;
-      this.errorMessage = `Only ${this.questionCount} questions available in the bank.`;
-    } else if (this.assessment.numberOfQuestions < 0) {
-      this.assessment.numberOfQuestions = 0;
+  updateBankStatus() {
+    if (this.questionCount < this.REQUIRED_COUNT) {
+      this.bankMessage = `Add ${this.REQUIRED_COUNT - this.questionCount} more questions to enable saving.`;
     } else {
-      this.errorMessage = '';
+      this.bankMessage = '';
     }
-    this.updateMarks();
-  }
-
-  updateMarks() {
-    // Logic: 1 Mark per question
-    this.assessment.maxMarks = (this.assessment.numberOfQuestions || 0) * 1;
   }
 
   addQuestionToBank() {
-    // Ensure all fields required by Java @NotBlank are filled
-    if (!this.newQuestion.question || !this.newQuestion.answer || !this.newQuestion.option1) {
-      this.errorMessage = "Please fill in all question fields and the correct answer.";
+    if (this.questionForm.invalid) {
+      alert("Please fill in the Question, Option 1, Option 2, and the Answer.");
       return;
     }
 
-    this.api.createQuestion(this.newQuestion).subscribe({
+    this.api.createQuestion(this.questionForm.value).subscribe({
       next: () => {
-        this.resetQuestionForm();
-        this.loadQuestions(); // Refreshes list and questionCount
-        this.errorMessage = '';
+        this.questionForm.reset({ courseId: this.courseId });
+        this.loadQuestions();
       },
-      error: () => {
-        this.errorMessage = "Failed to save the question.";
-      }
+      error: (err) => alert("Error saving question: " + (err.error?.message || 'Check connection'))
     });
   }
 
-  resetQuestionForm() {
-    this.newQuestion = {
-      courseId: this.courseId,
-      question: '',
-      option1: '',
-      option2: '',
-      option3: '',
-      option4: '',
-      answer: ''
-    };
-  }
-
-  deleteQuestion(questionId: number) {
-    if (confirm('Permanently delete this question from the bank?')) {
-      this.api.deleteQuestion(questionId).subscribe(() => {
-        this.loadQuestions();
-      });
+  deleteQuestion(id: number) {
+    if (confirm('Delete this question?')) {
+      this.api.deleteQuestion(id).subscribe(() => this.loadQuestions());
     }
   }
 
   createAssessment() {
-    if (this.assessment.numberOfQuestions <= 0) {
-      this.errorMessage = "Please select at least 1 question.";
-      return;
-    }
-    if (!this.assessment.dueDate) {
-      this.errorMessage = "Due date is required.";
-      return;
-    }
+    this.serverErrorMessage = ''; // Reset errors on new attempt
 
-    this.api.createAssessment(this.assessment).subscribe(() => {
-      this.router.navigate(['/courses', this.courseId]);
+    if (this.questionCount < this.REQUIRED_COUNT) return;
+
+    // Use .getRawValue() to include 'disabled' fields like numberOfQuestions
+    const payload = this.assessmentForm.getRawValue();
+
+    this.api.createAssessment(payload).subscribe({
+      next: () => {
+        this.router.navigate(['/courses', this.courseId]);
+      },
+      error: (err) => {
+        // This captures the "Due date cannot be in the past" from your Java backend
+        this.serverErrorMessage = err.error?.message || "Server error occurred.";
+      }
     });
   }
 }
