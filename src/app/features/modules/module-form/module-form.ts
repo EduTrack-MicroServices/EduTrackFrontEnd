@@ -69,11 +69,14 @@ export class ModuleFormComponent implements OnInit {
     }
   }
 
+  onCancel() {
+    this.router.navigate(['/programs', this.programId, 'courses', this.courseId]);
+  }
   private handleSuccess(msg: string) {
     alert(msg);
     // If we have courseId, go back to course details, otherwise go to dashboard
     if (this.courseId) {
-      this.router.navigate(['/programs', this.programId, '/courses', this.courseId]);
+      this.router.navigate(['/programs', this.programId, 'courses', this.courseId]);
     } else {
       window.history.back(); // Simple way to return to previous page
     }

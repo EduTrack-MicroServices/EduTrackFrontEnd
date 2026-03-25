@@ -69,6 +69,9 @@ export class ProgramFormComponent implements OnInit {
     }
   }
 
+  onCancel() {
+    this.router.navigate(['/program-list']);
+  }
   private handleSuccess(msg: string) {
     alert(msg);
     this.router.navigate(['/program-list']); 

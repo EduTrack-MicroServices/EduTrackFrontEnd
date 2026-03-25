@@ -1,39 +1,78 @@
-<div class="container mt-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">EduTrack Programs</h2>
-    
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-5 p-4 bg-white shadow-sm rounded-4 border-start border-5 border-primary animate__animated animate__fadeIn">
+    <div>
+      <h2 class="fw-bold text-dark mb-1">EduTrack <span class="text-primary text-gradient">Programs</span></h2>
+      <p class="text-muted mb-0 small uppercase-tracking">Explore curated learning paths for software mastery</p>
+    </div>
     @if (isEditor()) {
-      <button class="btn btn-success" routerLink="/programs/new">
-        <i class="bi bi-plus-lg"></i> Create New Program
+      <button class="btn btn-primary rounded-pill px-4 py-2 shadow-sm hover-lift" routerLink="/programs/new">
+        <i class="bi bi-plus-circle-fill me-2"></i>Create Program
       </button>
     }
   </div>
-  
-  <div class="row g-4">
-    @for (program of programs(); track program.programId) {
-      <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title fw-bold">{{ program.name }}</h5>
-            <p class="card-text text-muted">{{ program.description }}</p>
-          </div>
-          
-          <div class="card-footer bg-transparent border-0 d-flex gap-2 pb-3">
-            <button class="btn btn-primary flex-grow-1" [routerLink]="['/programs', program.programId]" [disabled]="program.status === 'INACTIVE'" >
-              View
-            </button>
 
-            @if (isEditor()) {
-              <button class="btn btn-outline-warning" [routerLink]="['/programs/edit', program.programId]">
-                <i class="bi bi-pencil"></i>
+  @if (isLoading()) {
+    <div class="text-center py-5 mt-5">
+      <div class="spinner-grow text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+      <p class="mt-3 text-muted fw-medium">Syncing with server...</p>
+    </div>
+  } @else {
+    <div class="row g-4">
+      @for (program of programs(); track program.programId) {
+        <div class="col-xl-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm modern-program-card transition-all">
+            
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="program-icon-wrapper bg-primary-subtle text-primary">
+                  <i class="bi bi-code-square fs-4"></i>
+                </div>
+                <span class="badge rounded-pill status-badge" 
+                      [ngClass]="program.status === 'ACTIVE' ? 'status-active' : 'status-inactive'">
+                  <span class="dot me-1"></span> {{ program.status }}
+                </span>
+              </div>
+
+              <h5 class="card-title fw-bold text-dark mb-2">{{ program.name }}</h5>
+              <p class="card-text text-muted small line-clamp-3 mb-4">
+                {{ program.description || 'No description provided for this learning track.' }}
+              </p>
+
+              <div class="d-flex align-items-center gap-3 mb-4 pt-3 border-top border-light">
+                <div class="small text-muted"><i class="bi bi-calendar3 me-1"></i> 12 Weeks</div>
+                <div class="small text-muted"><i class="bi bi-people me-1"></i> 1.2k Students</div>
+              </div>
+            </div>
+            
+            <div class="card-footer bg-light border-0 p-3 d-flex gap-2">
+              <button class="btn btn-primary flex-grow-1 rounded-3 py-2 fw-bold shadow-sm" 
+                      [routerLink]="['/programs', program.programId]" 
+                      [disabled]="program.status === 'INACTIVE'">
+                {{ program.status === 'INACTIVE' ? 'Unavailable' : 'Explore Program' }}
               </button>
-              <button class="btn btn-outline-danger" (click)="onDelete(program.programId!)">
-                <i class="bi bi-trash"></i>
-              </button>
-            }
+
+              @if (isEditor()) {
+                <div class="btn-group shadow-sm rounded-3 overflow-hidden">
+                  <button class="btn btn-white border-start" [routerLink]="['/programs/edit', program.programId]" title="Edit">
+                    <i class="bi bi-pencil-square text-warning"></i>
+                  </button>
+                  <button class="btn btn-white border-start" (click)="onDelete(program.programId!)" title="Delete">
+                    <i class="bi bi-trash3 text-danger"></i>
+                  </button>
+                </div>
+              }
+            </div>
           </div>
         </div>
-      </div>
-    }
-  </div>
+      } @empty {
+        <div class="col-12 text-center py-5">
+           <div class="empty-state-icon mb-3">
+             <i class="bi bi-cloud-slash display-2 text-light"></i>
+           </div>
+           <h4 class="text-dark-50 fw-bold">No Programs Found</h4>
+           <p class="text-muted">Start by creating a new learning track above.</p>
+        </div>
+      }
+    </div>
+  }
 </div>

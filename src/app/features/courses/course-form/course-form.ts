@@ -69,6 +69,9 @@ export class CourseFormComponent implements OnInit {
     }
   }
 
+  onCancel() {
+    this.router.navigate(['/programs', this.programId]);
+  }
   handleSuccess(msg: string) {
     alert(msg);
     // Redirect back to program details

@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 export class ProgramListComponent implements OnInit {
   private courseService = inject(CourseService);
   private authService = inject(AuthService);
+  isLoading = signal<boolean>(true);
   
   programs = signal<Program[]>([]);
   
@@ -23,13 +24,18 @@ export class ProgramListComponent implements OnInit {
     return role === 'ADMIN' || role === 'INSTRUCTOR';
   });
 
-  ngOnInit() {
+ngOnInit() {
     this.loadPrograms();
   }
 
   loadPrograms() {
+    this.isLoading.set(true);
     this.courseService.getAllPrograms().subscribe({
-      next: (res) => { if (res.success) this.programs.set(res.data); }
+      next: (res) => { 
+        if (res.success) this.programs.set(res.data);
+        this.isLoading.set(false); // Stop loading
+      },
+      error: () => this.isLoading.set(false)
     });
   }
 

@@ -23,7 +23,7 @@ export class ProgramDetailsComponent implements OnInit {
 
   private router = inject(Router);
 
-
+  isLoading = signal<boolean>(true);
 
   program = signal<Program | null>(null);
   courses = signal<Course[]>([]);
@@ -42,6 +42,27 @@ export class ProgramDetailsComponent implements OnInit {
   }
 
 
+
+
+ 
+
+  loadData() {
+    this.isLoading.set(true); // Start loading
+    
+    // Use forkJoin if you want to wait for both, 
+    // or just set loading to false when the main content (courses) arrives.
+    this.courseService.getProgramById(this.programId).subscribe(res => {
+      if (res.success) this.program.set(res.data);
+    });
+
+    this.courseService.getCoursesByProgram(this.programId).subscribe({
+      next: (res) => {
+        if (res.success) this.courses.set(res.data);
+        this.isLoading.set(false); // Stop loading
+      },
+      error: () => this.isLoading.set(false) // Stop even on error
+    });
+  }
   
 
   checkStatus() {
@@ -51,18 +72,7 @@ export class ProgramDetailsComponent implements OnInit {
   });
 }
 
-  loadData() {
-    // 1. Get Program Details
-    this.courseService.getProgramById(this.programId).subscribe(res => {
-      if (res.success) this.program.set(res.data);
-    });
-
-    // 2. Get Courses for this Program
-    this.courseService.getCoursesByProgram(this.programId).subscribe(res => {
-      if (res.success) this.courses.set(res.data);
-    });
-  }
-
+ 
   onDeleteCourse(courseId: number) {
     if (confirm('Are you sure you want to delete this course?')) {
       this.courseService.deleteCourse(courseId).subscribe(() => {
