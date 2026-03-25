@@ -1,0 +1,36 @@
+/* Modern Glassy Status Badges */
+.badge-glass-pending {
+  background-color: rgba(255, 193, 7, 0.15) !important;
+  color: #b78100 !important; /* Darker yellow for text readability */
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  backdrop-filter: blur(4px);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.badge-glass-success {
+  background-color: rgba(25, 135, 84, 0.15) !important;
+  color: #146c43 !important; /* Darker green */
+  border: 1px solid rgba(25, 135, 84, 0.3);
+  backdrop-filter: blur(4px);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.badge-glass-danger {
+  background-color: rgba(220, 53, 69, 0.15) !important;
+  color: #b02a37 !important; /* Darker red */
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  backdrop-filter: blur(4px);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.badge-glass-primary {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+  color: #0a58ca !important; /* Darker blue */
+  border: 1px solid rgba(13, 110, 253, 0.3);
+  backdrop-filter: blur(4px);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}

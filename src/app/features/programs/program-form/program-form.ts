@@ -4,6 +4,7 @@ import { CourseService } from '../../../core/services/course-service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Program } from '../../../core/models/course';
 import { CommonModule } from '@angular/common';
+import { toast } from 'ngx-sonner'; // <-- Import Sonner toast
 
 @Component({
   selector: 'app-program-form',
@@ -45,6 +46,9 @@ export class ProgramFormComponent implements OnInit {
           // Fill the form with existing data
           this.programForm.patchValue(res.data);
         }
+      },
+      error: () => {
+        toast.error('Failed to load program details');
       }
     });
   }
@@ -56,21 +60,34 @@ export class ProgramFormComponent implements OnInit {
       if (this.isEditMode && this.programId) {
         // UPDATE Logic
         this.courseService.updateProgram(this.programId, programData).subscribe({
-          next: () => this.handleSuccess('Program Updated Successfully'),
-          error: (err) => alert(err.error?.message || 'Update failed')
+          next: () => this.handleSuccess('Program Updated Successfully!'),
+          error: (err) => {
+            const backendErrors = err.error?.errors || err.error?.message;
+            const errorMessage = Array.isArray(backendErrors) ? backendErrors.join(', ') : (backendErrors || 'Update failed');
+            toast.error('Failed to update program', { description: errorMessage });
+          }
         });
       } else {
         // CREATE Logic
         this.courseService.createProgram(programData).subscribe({
-          next: () => this.handleSuccess('Program Created Successfully'),
-          error: (err) => alert(err.error?.message || 'Creation failed')
+          next: () => this.handleSuccess('Program Created Successfully!'),
+          error: (err) => {
+            const backendErrors = err.error?.errors || err.error?.message;
+            const errorMessage = Array.isArray(backendErrors) ? backendErrors.join(', ') : (backendErrors || 'Creation failed');
+            toast.error('Failed to create program', { description: errorMessage });
+          }
         });
       }
+    } else {
+      // Form Validation Fallback
+      toast.warning('Invalid Form', { 
+        description: 'Please ensure all required fields are filled out correctly.' 
+      });
     }
   }
 
   private handleSuccess(msg: string) {
-    alert(msg);
+    toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
     this.router.navigate(['/program-list']); 
   }
 }

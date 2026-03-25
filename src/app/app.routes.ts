@@ -14,6 +14,7 @@ import { ModuleFormComponent } from './features/modules/module-form/module-form'
 import { ModuleViewerComponent } from './features/contents/module-viewer/module-viewer';
 import { ContentFormComponent } from './features/contents/content-form/content-form';
 import { HomeComponent } from './features/home/home';
+import { Analysispage } from './features/analysispage/analysispage';
 
 export const routes: Routes = [
     {
@@ -52,6 +53,13 @@ export const routes: Routes = [
         component: ProgramFormComponent,
         canActivate: [authGuard, roleGuard],
         data: { role: 'INSTRUCTOR' }
+    },
+    {
+        path:'analysispage',
+        component:Analysispage,
+        canActivate: [authGuard, roleGuard],
+        data:{role:'STUDENT'}
+
     },
 
     {

@@ -18,7 +18,8 @@ export class HomeComponent {
   private router = inject(Router);
 
   // Controls which form is visible ('register' or 'login')
-  activeTab = signal<'login' | 'register'>('register');
+  // Controls which form is visible ('register' or 'login')
+  activeTab = signal<'login' | 'register'>('login');
 
   // Assumes you moved logo.png to the 'public' folder for Angular 17+
   logoPath = '/logo.png'; 

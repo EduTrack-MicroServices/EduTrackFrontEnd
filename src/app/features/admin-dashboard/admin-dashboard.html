@@ -5,7 +5,7 @@
       <h2 class="fw-bold text-dark mb-0">Admin <span class="text-primary">Console</span></h2>
       <p class="text-muted small">Manage users, instructor approvals, enrollments and progress</p>
     </div>
-    <button class="btn btn-primary shadow-sm" (click)="loadUsers()" [disabled]="loading()">
+    <button class="btn btn-primary shadow-sm rounded-pill px-4" (click)="loadUsers()" [disabled]="loading()">
       <i class="bi bi-arrow-clockwise me-2"></i>{{ loading() ? 'Refreshing...' : 'Refresh Data' }}
     </button>
   </div>
@@ -68,6 +68,7 @@
               <th>Contact Info</th>
               <th>Role</th>
               <th>Account Status</th>
+              <th class="text-center">Accept / Reject</th>
               <th class="text-end pe-4">Actions</th>
             </tr>
           </thead>
@@ -95,26 +96,65 @@
                     {{ user.role }}
                   </span>
                 </td>
-                <td><small class="text-muted">{{ user.accountStatus }}</small></td>
+                
+                <td>
+                  <span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center shadow-sm" 
+                    [ngClass]="{
+                      'badge-glass-pending': user.accountStatus?.toUpperCase() === 'PENDING' || !user.accountStatus,
+                      'badge-glass-success': user.accountStatus?.toUpperCase() === 'APPROVED' || user.accountStatus?.toUpperCase() === 'ACTIVE',
+                      'badge-glass-danger': user.accountStatus?.toUpperCase() === 'REJECTED'
+                    }">
+                    <i class="me-2" style="font-size: 0.85rem;" [ngClass]="{
+                      'bi bi-hourglass-split': user.accountStatus?.toUpperCase() === 'PENDING' || !user.accountStatus,
+                      'bi bi-check-circle-fill': user.accountStatus?.toUpperCase() === 'APPROVED' || user.accountStatus?.toUpperCase() === 'ACTIVE',
+                      'bi bi-x-circle-fill': user.accountStatus?.toUpperCase() === 'REJECTED'
+                    }"></i>
+                    {{ (user.accountStatus || 'Pending') | uppercase }}
+                  </span>
+                </td>
+
+                <td class="text-center">
+                  @if (user.role === 'INSTRUCTOR') {
+                    <div class="d-flex justify-content-center gap-2">
+                      
+                      @if (user.accountStatus?.toUpperCase() === 'PENDING' || !user.accountStatus) {
+                        <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
+                          <i class="bi bi-check-lg me-1"></i> Accept
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" (click)="rejectInstructor(user.email)">
+                          <i class="bi bi-x-lg me-1"></i> Reject
+                        </button>
+                      } 
+                      
+                      @else if (user.accountStatus?.toUpperCase() === 'APPROVED' || user.accountStatus?.toUpperCase() === 'ACTIVE') {
+                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" (click)="rejectInstructor(user.email)">
+                          <i class="bi bi-x-lg me-1"></i> Reject
+                        </button>
+                      } 
+                      
+                      @else if (user.accountStatus?.toUpperCase() === 'REJECTED') {
+                        <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
+                          <i class="bi bi-check-lg me-1"></i> Accept
+                        </button>
+                      }
+                    </div>
+                  } @else {
+                    <span class="text-muted small">-</span>
+                  }
+                </td>
+
                 <td class="text-end pe-4">
-                  <div class="btn-group">
-                    @if (user.role === 'INSTRUCTOR') {
-                      <button class="btn btn-sm btn-success" (click)="approveInstructor(user.email)" title="Approve">
-                        <i class="bi bi-check-circle"></i>
-                      </button>
-                      <button class="btn btn-sm btn-warning" (click)="rejectInstructor(user.email)" title="Reject">
-                        <i class="bi bi-x-circle"></i>
-                      </button>
-                    }
-                    <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user.userId)" title="Delete User">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
+                  <button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" 
+                          (click)="deleteUser(user.userId)" 
+                          title="Delete User"
+                          style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="text-center p-5 text-muted">
+                <td colspan="6" class="text-center p-5 text-muted">
                   <i class="bi bi-person-x text-secondary d-block fs-2 mb-2"></i>
                   No users found for the selected role.
                 </td>
@@ -133,8 +173,8 @@
           <h5 class="mb-0 fw-bold">Enrollment Management</h5>
           <small class="text-muted">Viewing all enrollments. Use filters to narrow down.</small>
         </div>
-        <button class="btn btn-sm btn-light border shadow-sm" (click)="loadAllEnrollments()">
-          <i class="bi bi-arrow-clockwise"></i> Refresh
+        <button class="btn btn-sm btn-light border shadow-sm rounded-pill px-3" (click)="loadAllEnrollments()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh
         </button>
       </div>
       
@@ -226,14 +266,17 @@
                   </td>
 
                   <td>
-                    <span class="badge rounded-pill px-3" 
-                          [ngClass]="enr.status === 'Active' ? 'bg-success' : (enr.status === 'Completed' ? 'bg-primary' : 'bg-danger')">
+                    <span class="badge rounded-pill px-3 py-2 shadow-sm" 
+                          [ngClass]="enr.status === 'Active' ? 'badge-glass-success' : (enr.status === 'Completed' ? 'badge-glass-primary' : 'badge-glass-danger')">
                       {{ enr.status }}
                     </span>
                   </td>
                   <td class="small text-muted">{{ enr.enrolledDate | date:'mediumDate' }}</td>
                   <td class="text-end pe-4">
-                    <button class="btn btn-sm btn-outline-danger" (click)="deleteEnrollmentRecord(enr.enrollmentId)" title="Delete Enrollment">
+                    <button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" 
+                            (click)="deleteEnrollmentRecord(enr.enrollmentId)" 
+                            title="Delete Enrollment"
+                            style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
                       <i class="bi bi-trash"></i>
                     </button>
                   </td>
@@ -256,7 +299,7 @@
   <div class="card shadow-sm border-0 overflow-hidden mt-4">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
       <h5 class="mb-0 fw-bold">Student Attendance Overview</h5>
-      <button class="btn btn-sm btn-outline-primary" (click)="loadAllAttendances()">
+      <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="loadAllAttendances()">
         <i class="bi bi-arrow-clockwise me-1"></i> Sync Attendance
       </button>
     </div>
@@ -289,7 +332,7 @@
                     </div>
                   </td>
                   <td>
-                    <span class="badge bg-success rounded-pill px-3">{{ user.role }}</span>
+                    <span class="badge badge-glass-success rounded-pill px-3 py-2">{{ user.role }}</span>
                   </td>
 
                   @if (attendanceMap().get(user.userId); as attendance) {
@@ -332,7 +375,7 @@
         <h5 class="mb-0 fw-bold">Staff Attendance Overview</h5>
         <small class="text-muted">Admins and Instructors</small>
       </div>
-      <button class="btn btn-sm btn-outline-primary" (click)="loadAllAttendances()">
+      <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="loadAllAttendances()">
         <i class="bi bi-arrow-clockwise me-1"></i> Sync Attendance
       </button>
     </div>
@@ -365,8 +408,8 @@
                     </div>
                   </td>
                   <td>
-                    <span class="badge rounded-pill px-3" 
-                          [ngClass]="user.role === 'ADMIN' ? 'bg-danger' : 'bg-info'">
+                    <span class="badge rounded-pill px-3 py-2" 
+                          [ngClass]="user.role === 'ADMIN' ? 'badge-glass-danger' : 'badge-glass-primary'">
                       {{ user.role }}
                     </span>
                   </td>
