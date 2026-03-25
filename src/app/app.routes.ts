@@ -13,7 +13,12 @@ import { CourseDetailsComponent } from './features/courses/course-details/course
 import { ModuleFormComponent } from './features/modules/module-form/module-form';
 import { ModuleViewerComponent } from './features/contents/module-viewer/module-viewer';
 import { ContentFormComponent } from './features/contents/content-form/content-form';
+import { AssessmentScoreComponent } from './features/assessment/assessment-score/assessment-score';
+import { AssessmentTakeComponent } from './features/assessment/assessment-take/assessment-take';
+import { AssessmentViewComponent } from './features/assessment/assessment-view/assessment-view';
+import { AssessmentCreateComponent } from './features/assessment/assessment-create/assessment-create';
 import { HomeComponent } from './features/home/home';
+import { Analysispage } from './features/analysispage/analysispage';
 
 export const routes: Routes = [
     {
@@ -53,6 +58,13 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard],
        data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
+    {
+        path:'analysispage',
+        component:Analysispage,
+        canActivate: [authGuard, roleGuard],
+        data:{role:'STUDENT'}
+
+    },
 
     {
         path: 'programs/:id', component: ProgramDetailsComponent, canActivate: [authGuard]
@@ -72,7 +84,11 @@ export const routes: Routes = [
         component: CourseDetailsComponent, canActivate: [authGuard],
     
     },
-
+    {
+        path: 'courses/:courseId',
+        component: CourseDetailsComponent,
+        canActivate: [authGuard]
+    },
     {
         path: 'programs/:programId/courses/:courseId/add-module',
         component: ModuleFormComponent,
@@ -92,6 +108,30 @@ export const routes: Routes = [
             path: 'modules/:moduleId/add-content', 
             component: ContentFormComponent, canActivate: [authGuard]
     },
+    {
+  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
+},
+{
+  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
+},
+{
+  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
+},
+{
+  path: 'courses/:courseId/assessment/score',component: AssessmentScoreComponent
+},
+    {
+  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
+},
+{
+  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
+},
+{
+  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
+},
+{
+  path: 'courses/:courseId/assessment/result',component: AssessmentScoreComponent
+},
     {
         path: '', redirectTo: 'home', pathMatch: 'full'
     }

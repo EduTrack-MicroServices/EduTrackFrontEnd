@@ -4,10 +4,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Course } from '../../../core/models/course';
 import { CourseService } from '../../../core/services/course-service';
 import { CommonModule } from '@angular/common';
+import { toast } from 'ngx-sonner'; // <-- Import Sonner toast
 
 @Component({
   selector: 'app-course-form',
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './course-form.html',
   styleUrl: './course-form.css',
 })
@@ -44,8 +45,13 @@ export class CourseFormComponent implements OnInit {
   }
 
   loadCourseData(id: number) {
-    this.courseService.getCourseById(id).subscribe(res => {
-      if (res.success) this.courseForm.patchValue(res.data);
+    this.courseService.getCourseById(id).subscribe({
+      next: (res) => {
+        if (res.success) this.courseForm.patchValue(res.data);
+      },
+      error: () => {
+        toast.error('Failed to load course details');
+      }
     });
   }
 
@@ -56,16 +62,29 @@ export class CourseFormComponent implements OnInit {
       if (this.isEditMode && this.courseId) {
         // UPDATE: PUT /api/courses/{courseId}
         this.courseService.updateCourse(this.courseId, courseData).subscribe({
-          next: () => this.handleSuccess('Course Updated!'),
-          error: (err) => alert(err.error?.errors || 'Update failed')
+          next: () => this.handleSuccess('Course Updated Successfully!'),
+          error: (err) => {
+            const backendErrors = err.error?.errors || err.error?.message;
+            const errorMessage = Array.isArray(backendErrors) ? backendErrors.join(', ') : (backendErrors || 'Update failed');
+            toast.error('Failed to update course', { description: errorMessage });
+          }
         });
       } else if (this.programId) {
         // CREATE: POST /api/programs/{programId}/courses
         this.courseService.addCourse(this.programId, courseData).subscribe({
           next: () => this.handleSuccess('Course Added to Program!'),
-          error: (err) => alert(err.error?.message || 'Creation failed')
+          error: (err) => {
+            const backendErrors = err.error?.errors || err.error?.message;
+            const errorMessage = Array.isArray(backendErrors) ? backendErrors.join(', ') : (backendErrors || 'Creation failed');
+            toast.error('Failed to create course', { description: errorMessage });
+          }
         });
       }
+    } else {
+      // Form Validation Fallback
+      toast.warning('Invalid Form', { 
+        description: 'Please ensure all required fields are filled out correctly.' 
+      });
     }
   }
 
@@ -73,7 +92,8 @@ export class CourseFormComponent implements OnInit {
     this.router.navigate(['/programs', this.programId]);
   }
   handleSuccess(msg: string) {
-    alert(msg);
+    toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
+    
     // Redirect back to program details
     if (this.programId) {
         this.router.navigate(['/programs', this.programId]);

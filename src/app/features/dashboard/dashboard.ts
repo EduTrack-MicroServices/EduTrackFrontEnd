@@ -6,10 +6,11 @@ import { EnrollmentResponse } from '../../core/models/enrollment';
 import { EnrollmentService } from '../../core/services/enrollment-service';
 import { Program } from '../../core/models/course';
 import { CourseService } from '../../core/services/course-service';
+import { toast } from 'ngx-sonner'; // <-- Added Sonner for notifications
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true, // Assuming standalone based on previous code
+  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -23,7 +24,7 @@ export class DashboardComponent implements OnInit {
   today = new Date();
   enrolledPrograms = signal<EnrollmentResponse[]>([]);
   userRole = this.authService.userRole;
-  programDetails = signal<Program[]>([]); // For students to show enrolled program details
+  programDetails = signal<Program[]>([]); 
 
   // Dynamic Stats
   totalEnrolled = computed(() => this.enrolledPrograms().length);
@@ -32,30 +33,8 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     if (this.userRole() === 'STUDENT') {
       this.loadMyEnrollments();
-     
     }
   }
-
-   getMyProgramDetails() {
-    this.programDetails.set([]); // Clear previous details
-   
-    console.log('Fetching program details for enrolled programs:', this.enrolledPrograms());
-    // Fetch details for each enrolled program  
-
-    this.enrolledPrograms().forEach(enroll => {
-      this.programService.getProgramById(enroll.programId).subscribe({
-        next: (res) => {
-          if (res.success) {
-            this.programDetails.update(details => [...details, res.data]);
-            console.log('Fetched program details for programId:', enroll.programId, res.data);
-          }
-        },
-        error: (err) => console.error('Error fetching program details:', err)
-      });
-    });
-   }
-
-
 
   loadMyEnrollments() {
     const userId = this.authService.getUserId();
@@ -63,15 +42,43 @@ export class DashboardComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.enrolledPrograms.set(res.data);
-           this.getMyProgramDetails();
+          this.getMyProgramDetails();
         }
       },
-      error: (err) => console.error('Dashboard Error:', err)
+      error: (err) => {
+        console.error('Dashboard Error:', err);
+        toast.error('Failed to load enrollments', {
+          description: 'Could not fetch your enrolled programs at this time.'
+        });
+      }
+    });
+  }
+
+  getMyProgramDetails() {
+    this.programDetails.set([]); // Clear previous details
+    
+    this.enrolledPrograms().forEach(enroll => {
+      this.programService.getProgramById(enroll.programId).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.programDetails.update(details => [...details, res.data]);
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching program details:', err);
+          toast.error('Failed to load program details', {
+            description: `Could not fetch details for Program ID: ${enroll.programId}`
+          });
+        }
+      });
     });
   }
 
   onLogout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    toast.info('Logged Out', {
+      description: 'You have been successfully logged out.'
+    });
+    this.router.navigate(['/']); // Redirect to home page after logout
   }
 }

@@ -1,32 +1,32 @@
 .app-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #f8fafc; /* Beautiful soft slate gray */
 }
 
-/* Base styles for the dynamic right-side area */
 .content-area {
   flex-grow: 1;
-  transition: margin-left 0.3s ease;
+  /* Syncs perfectly with the sidebar CSS transition */
+  transition: margin-left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   width: 100%;
 }
 
-/* Margin matches sidebar width */
+/* Margin perfectly matches the NEW expanded sidebar width */
 .content-shifted {
-  margin-left: 250px; 
+  margin-left: 280px; 
 }
 
+/* Margin perfectly matches the NEW collapsed sidebar width */
 .content-collapsed {
-  margin-left: 70px;
+  margin-left: 88px;
 }
 
 .full-width {
   width: 100%;
 }
 
-/* Ensure responsiveness on small screens */
 @media (max-width: 768px) {
   .content-shifted, .content-collapsed {
-    margin-left: 0;
+    margin-left: 0; 
   }
 }

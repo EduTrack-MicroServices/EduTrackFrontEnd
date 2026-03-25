@@ -66,6 +66,79 @@
                         </p>
                     }
                 </div>
+
+                 <div class="row mt-4 pt-3 border-top">
+        <div class="col-12">
+          <div class="d-flex flex-wrap gap-3">
+            @if (isEditor()) {
+              @if (!hasAssessment) {
+                <button
+                  class="btn btn-outline-primary d-flex align-items-center px-4 py-2 border-2 rounded-3 shadow-sm transition-hover"
+                  [routerLink]="['/courses', courseId, 'assessment', 'create']"
+                >
+                  <i class="bi bi-journal-plus fs-4 me-2"></i>
+                  <div class="text-start">
+                    <span class="d-block fw-bold lh-1">Add Assessment</span>
+                    <small class="text-muted" style="font-size: 0.75rem">Create quiz & marks</small>
+                  </div>
+                </button>
+              } @else {
+                <button
+                  class="btn btn-primary d-flex align-items-center px-4 py-2 rounded-3 shadow-sm"
+                  [routerLink]="['/courses', courseId, 'assessment']"
+                >
+                  <i class="bi bi-eye fs-4 me-2"></i>
+                  <div class="text-start">
+                    <span class="d-block fw-bold lh-1">Show Assessment</span>
+                    <small class="text-white-50" style="font-size: 0.75rem">Manage quiz bank</small>
+                  </div>
+                </button>
+              }
+            } @else if (hasAssessment) {
+              @if (!submission()) {
+                <button
+                  class="btn btn-success d-flex align-items-center px-4 py-2 rounded-3 shadow transition-hover"
+                  [routerLink]="['/courses', courseId, 'assessment']"
+                >
+                  <i class="bi bi-pencil-square fs-4 me-2"></i>
+                  <div class="text-start">
+                    <span class="d-block fw-bold lh-1">Take Assessment</span>
+                    <small class="text-white-50" style="font-size: 0.75rem"
+                      >Evaluate your learning</small
+                    >
+                  </div>
+                </button>
+              } @else if (submission().score < 4) {
+                <button
+                  class="btn btn-warning d-flex align-items-center px-4 py-2 rounded-3 shadow transition-hover text-dark"
+                  [routerLink]="['/courses', courseId, 'assessment']"
+                >
+                  <i class="bi bi-arrow-clockwise fs-4 me-2"></i>
+                  <div class="text-start">
+                    <span class="d-block fw-bold lh-1 text-dark">Retry Quiz</span>
+                    <small class="text-dark-50" style="font-size: 0.75rem"
+                      >Last Score: {{ submission().score }} - Failed</small
+                    >
+                  </div>
+                </button>
+              } @else {
+                <button
+                  class="btn btn-info d-flex align-items-center px-4 py-2 rounded-3 shadow transition-hover text-white"
+                  [routerLink]="['/courses', courseId, 'assessment']"
+                >
+                  <i class="bi bi-patch-check fs-4 me-2"></i>
+                  <div class="text-start">
+                    <span class="d-block fw-bold lh-1">Show Results</span>
+                    <small class="text-white-50" style="font-size: 0.75rem"
+                      >Score: {{ submission().score }} - Passed</small
+                    >
+                  </div>
+                </button>
+              }
+            }
+          </div>
+        </div>
+      </div>
             </div>
         </div>
     </div>
@@ -103,29 +176,15 @@
                                     <i class="bi bi-lock-fill text-muted fs-4"></i>
                                 }
 
-                                @if (isEditor()) {
-                                    <div class="dropdown">
-                                        <button class="btn btn-light btn-sm rounded-circle" data-bs-toggle="dropdown">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                                            <li><a class="dropdown-item py-2" [routerLink]="['/modules/edit', module.moduleId]">
-                                                <i class="bi bi-pencil me-2 text-warning"></i> Edit Module</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item py-2 text-danger" (click)="onDeleteModule(module.moduleId!)">
-                                                <i class="bi bi-trash me-2"></i> Delete</a></li>
-                                        </ul>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
+                @if (isEditor()) {
+                <div class="btn-group shadow-sm bg-white">
+                    <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/modules/edit', module.moduleId]" title="Edit">
+                        <i class="bi bi-pencil text-warning"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" (click)="onDeleteModule(module.moduleId!)" title="Delete">
+                        <i class="bi bi-trash text-danger"></i>
+                    </button>
                 </div>
-                } @empty {
-                    <div class="text-center py-5 bg-white rounded-4 shadow-sm">
-                        <i class="bi bi-folder2-open display-1 text-light"></i>
-                        <p class="text-muted mt-3">No modules have been added to this curriculum yet.</p>
-                    </div>
                 }
             </div>
         </div>

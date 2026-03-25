@@ -34,7 +34,7 @@ export class AdminDashboardComponent implements OnInit {
   users = signal<UserResponse[]>([]);
   loading = signal<boolean>(false);
   
-  // NEW: User Role Filter Signal
+  // User Role Filter Signal
   selectedUserRole = signal<string>('');
 
   attendanceMap = signal<Map<number, AttendanceSummaryResponse>>(new Map());
@@ -47,7 +47,7 @@ export class AdminDashboardComponent implements OnInit {
   programs = signal<Program[]>([]);
 
   // --- Computed Values ---
-  // NEW: Real-time filtered users array based on the selected dropdown value
+  // Real-time filtered users array based on the selected dropdown value
   filteredUsers = computed(() => {
     const role = this.selectedUserRole();
     if (!role) {
