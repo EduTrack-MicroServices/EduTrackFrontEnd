@@ -1,8 +1,8 @@
 <div class="container mt-5 pb-5">
-  <form [formGroup]="assessmentForm" (ngSubmit)="createAssessment()">
+  <form [formGroup]="assessmentForm" (ngSubmit)="submitAssessment()">
     <div class="card shadow-sm mx-auto mb-4" style="max-width: 750px">
       <div class="card-header bg-dark text-white p-3">
-        <h4 class="mb-0">Create Quiz Assessment</h4>
+        <h4 class="mb-0">{{ isEditMode ? 'Update' : 'Create' }} Quiz Assessment</h4>
       </div>
       <div class="card-body p-4">
         @if (serverErrorMessage) {
@@ -51,7 +51,7 @@
             class="btn btn-success px-5 fw-bold"
             [disabled]="questionCount < REQUIRED_COUNT || assessmentForm.invalid"
           >
-            SAVE ASSESSMENT
+            {{ isEditMode ? 'UPDATE ASSESSMENT' : 'SAVE ASSESSMENT' }}
           </button>
         </div>
       </div>
@@ -61,7 +61,7 @@
   <form [formGroup]="questionForm">
     <div class="card shadow-sm mx-auto mb-4" style="max-width: 750px">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Add Question to Bank</h5>
+        <h5 class="mb-0">Add Question</h5>
       </div>
       <div class="card-body">
         <div class="mb-3">
@@ -141,7 +141,7 @@
           class="btn btn-outline-primary w-100 mt-3 fw-bold"
           (click)="addQuestionToBank()"
         >
-          ADD TO BANK
+          ADD Question
         </button>
       </div>
     </div>
@@ -149,7 +149,7 @@
 
   <div class="card shadow-sm mx-auto" style="max-width: 750px">
     <div class="card-header bg-light d-flex justify-content-between">
-      <h5 class="mb-0">Banked Questions ({{ questionCount }}/10)</h5>
+      <h5 class="mb-0">Questions ({{ questionCount }})</h5>
     </div>
     <div class="card-body p-0">
       <ul class="list-group list-group-flush">

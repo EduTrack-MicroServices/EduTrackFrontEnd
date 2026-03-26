@@ -13,7 +13,6 @@ export class AssessmentService {
   // ============================================================
   // ASSESSMENT APIs
   // ============================================================
-
   getAssessmentById(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/assessment/${id}`);
   }
