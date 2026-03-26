@@ -41,7 +41,7 @@ export const routes: Routes = [
         path: 'admin-dashboard',
         component: AdminDashboardComponent,
         canActivate: [authGuard, roleGuard],
-        data: { role: 'ADMIN' }
+        data: { roles: ['ADMIN'] }
     },
     {
         path: 'program-list', component: ProgramListComponent,
@@ -52,13 +52,13 @@ export const routes: Routes = [
     {
         path: 'programs/new', component: ProgramFormComponent,
         canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
+        data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'programs/edit/:id',
         component: ProgramFormComponent,
         canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
+       data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'student-progress',
@@ -79,11 +79,11 @@ export const routes: Routes = [
     {
         path: 'programs/:programId/add-course',
         component: CourseFormComponent, canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
+       data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'courses/edit/:courseId', component: CourseFormComponent, canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
+       data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'programs/:programId/courses/:courseId',
@@ -110,10 +110,10 @@ export const routes: Routes = [
         path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer',
         component: ModuleViewerComponent, canActivate: [authGuard]
     },
-    {
-        path: 'modules/:moduleId/add-content',
-        component: ContentFormComponent, canActivate: [authGuard]
-    },
+   { path: 'modules/:moduleId/add-content', component: ContentFormComponent,canActivate: [authGuard]},
+{ path: 'modules/:moduleId/edit-content/:contentId', component: ContentFormComponent,canActivate: [authGuard] },
+
+
     {
         path: 'courses/:courseId/assessment/create', component: AssessmentCreateComponent
     },

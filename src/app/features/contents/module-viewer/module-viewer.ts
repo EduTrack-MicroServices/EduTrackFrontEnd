@@ -5,6 +5,8 @@ import { Content } from '../../../core/models/content';
 import { AuthService } from '../../../core/services/auth';
 import { ContentService } from '../../../core/services/content-service';
 import { CommonModule } from '@angular/common';
+import { CourseService } from '../../../core/services/course-service';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-module-viewer',
@@ -17,13 +19,16 @@ export class ModuleViewerComponent implements OnInit {
   private contentService = inject(ContentService);
   private sanitizer = inject(DomSanitizer);
   private authService = inject(AuthService);
-
+  private courseService = inject(CourseService); // New
+  loading = signal<boolean>(true);
   moduleId!: number;
   programId!: number;
   courseId!: number;
   contents = signal<Content[]>([]);
   activeContent = signal<Content | null>(null);
   isEditor = computed(() => this.authService.userRole() === 'ADMIN' || this.authService.userRole() === 'INSTRUCTOR');
+
+  isModuleCompleted = signal<boolean>(false);
 
   ngOnInit() {
     this.moduleId = Number(this.route.snapshot.paramMap.get('moduleId'));
@@ -32,20 +37,77 @@ export class ModuleViewerComponent implements OnInit {
     console.log('Program ID from route:', this.programId);
     this.courseId = Number(this.route.snapshot.paramMap.get('courseId'));
     console.log('Course ID from route:', this.courseId);
-    this.loadContents();
+   
+
+    // Only check status for students
+    if (!this.isEditor()) {
+      this.checkModuleStatus();
+    }
+
+     this.loadContents();
   }
 
-  loadContents() {
-    this.contentService.getContentByModule(this.moduleId).subscribe(res => {
-      if (res.success) {
-        this.contents.set(res.data);
-        if (res.data.length > 0) this.selectContent(res.data[0]);
-      }
+  checkModuleStatus() {
+    const userId = this.authService.getUserId();
+    this.courseService.moduleStatus(userId, this.courseId, this.moduleId).subscribe({
+      next: (res) => {
+        // Since your backend returns 200 for both, we rely on the 'success' field
+        this.isModuleCompleted.set(res.success);
+      },
+      error: (err) => console.error('Error fetching module status', err)
     });
   }
 
+// Inside loadContents() method in module-viewer.component.ts
+
+loadContents() {
+  this.loading.set(true);
+  this.contentService.getContentByModule(this.moduleId).subscribe({
+    next: (res) => {
+      if (res.success) {
+        let rawData: Content[] = res.data;
+
+        // DRAFT FILTER LOGIC:
+        // If not an admin/instructor, show only Published items
+        if (!this.isEditor()) {
+          rawData = rawData.filter(item => item.status === 'Published');
+        }
+
+        this.contents.set(rawData);
+
+        if (rawData.length > 0) {
+          this.selectContent(rawData[0]);
+        } else {
+          this.activeContent.set(null);
+        }
+      }
+      this.loading.set(false);
+    },
+    error: (err) => {
+      console.error(err);
+      this.loading.set(false);
+    }
+  });
+}
+
   selectContent(content: Content) {
     this.activeContent.set(content);
+  }
+
+  markAsComplete() {
+    const userId = this.authService.getUserId();
+    this.courseService.markModuleComplete(userId, this.courseId, this.moduleId).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.isModuleCompleted.set(true);
+          toast.success('Module Completed!', {
+                        description: 'Successfully marked module as completed.',
+                        duration: 3500
+                      });
+        }
+      },
+      error: (err) => console.error('Error saving progress', err)
+    });
   }
 
   // Sanitize the URL for the Iframe
@@ -69,9 +131,7 @@ export class ModuleViewerComponent implements OnInit {
   return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
 }
 
-  back() {    
-    window.history.back();
-  }
+
   onDelete(id: number) {
     if (confirm('Delete this content?')) {
       this.contentService.deleteContent(id).subscribe(() => {

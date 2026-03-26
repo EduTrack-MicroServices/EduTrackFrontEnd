@@ -15,6 +15,7 @@ import { toast } from 'ngx-sonner'; // <-- Import Sonner toast
 export class ProgramListComponent implements OnInit {
   private courseService = inject(CourseService);
   private authService = inject(AuthService);
+  isLoading = signal<boolean>(true);
   
   programs = signal<Program[]>([]);
   
@@ -23,13 +24,15 @@ export class ProgramListComponent implements OnInit {
     return role === 'ADMIN' || role === 'INSTRUCTOR';
   });
 
-  ngOnInit() {
+ngOnInit() {
     this.loadPrograms();
   }
 
   loadPrograms() {
+    this.isLoading.set(true);
     this.courseService.getAllPrograms().subscribe({
       next: (res) => { 
+        this.isLoading.set(false);
         if (res.success) this.programs.set(res.data); 
       },
       error: () => {

@@ -86,6 +86,9 @@ export class ProgramFormComponent implements OnInit {
     }
   }
 
+  onCancel() {
+    this.router.navigate(['/program-list']);
+  }
   private handleSuccess(msg: string) {
     toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
     this.router.navigate(['/program-list']); 

@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { EnrollmentService } from '../../../core/services/enrollment-service';
 import { AssessmentService } from '../../../core/services/assessment-service';
 import { toast } from 'ngx-sonner'; // <-- Import Sonner toast
-
+ 
 @Component({
   selector: 'app-course-details',
   standalone: true,
@@ -22,33 +22,57 @@ export class CourseDetailsComponent implements OnInit {
   private enrollmentService = inject(EnrollmentService);
   private assessmentService = inject(AssessmentService);
   private cdr = inject(ChangeDetectorRef);
-
+ 
   course = signal<Course | null>(null);
   modules = signal<Module[]>([]);
   courseId!: number;
   pId!: number;
-
+ 
   // State for Assessment & Submissions
   hasAssessment = false;
-  submission = signal<any | null>(null); 
+  submission = signal<any | null>(null);
   isEnrolled = signal<boolean>(false);
-
+ 
   isEditor = computed(() => {
     const role = this.authService.userRole();
     return role === 'ADMIN' || role === 'INSTRUCTOR';
   });
 
+  canTakeAssessment = signal<boolean>(false);
+  completedCount = signal<number>(0);
+ 
   ngOnInit() {
     this.pId = Number(this.route.snapshot.paramMap.get('programId'));
     this.courseId = Number(this.route.snapshot.paramMap.get('courseId'));
 
-    if (this.pId) {
+    // FIX: Set enrollment true immediately for editors to prevent UI flickering
+    if (this.isEditor()) {
+      this.isEnrolled.set(true);
+    } else if (this.pId) {
       this.checkEnrollment(this.pId);
     }
+
     this.loadCourseAndModules();
     this.loadAssessment();
+    
+    if (!this.isEditor()) {
+      this.checkCourseProgress();
+    }
   }
 
+  checkCourseProgress() {
+    const userId = this.authService.getUserId();
+    this.courseService.getCourseProgressStatus(this.courseId, userId).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.canTakeAssessment.set(res.data.canTakeAssessment);
+          this.completedCount.set(res.data.completedModules);
+          this.cdr.detectChanges();
+        }
+      }
+    });
+  }
+ 
   loadAssessment() {
     this.assessmentService.getAssessmentByCourseId(this.courseId).subscribe({
       next: (res: any) => {
@@ -69,7 +93,7 @@ export class CourseDetailsComponent implements OnInit {
       }
     });
   }
-
+ 
   checkUserSubmission(assessmentId: number) {
     const userId = this.authService.getUserId();
     this.assessmentService.checkSubmission(userId, assessmentId).subscribe({
@@ -81,23 +105,31 @@ export class CourseDetailsComponent implements OnInit {
       }
     });
   }
-
+ 
   checkEnrollment(pId: number) {
+    // Double check here as well
     if (this.isEditor()) {
       this.isEnrolled.set(true);
       return;
     }
+
     const userId = this.authService.getUserId();
-    this.enrollmentService.checkEnrollmentExists(userId, pId).subscribe((exists) => {
-      this.isEnrolled.set(exists);
+    this.enrollmentService.checkEnrollmentExists(userId, pId).subscribe({
+      next: (exists) => {
+        this.isEnrolled.set(exists);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isEnrolled.set(false);
+      }
     });
   }
-
+ 
   loadCourseAndModules() {
     this.courseService.getCourseById(this.courseId).subscribe((res) => {
       if (res.success) this.course.set(res.data);
     });
-
+ 
     this.courseService.getModulesByCourse(this.courseId).subscribe((res) => {
       if (res.success) {
         const sorted = res.data.sort((a, b) => a.sequenceOrder - b.sequenceOrder);
@@ -105,7 +137,7 @@ export class CourseDetailsComponent implements OnInit {
       }
     });
   }
-
+ 
   onDeleteModule(moduleId: number) {
     // Action Toast replacing the confirm() dialog
     toast.warning('Delete this module?', {

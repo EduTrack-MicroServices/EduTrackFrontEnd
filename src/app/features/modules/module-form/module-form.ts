@@ -88,6 +88,11 @@ export class ModuleFormComponent implements OnInit {
     }
   }
 
+
+    onCancel() {
+  window.history.back();
+}
+  
   private handleSuccess(msg: string) {
     toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
     

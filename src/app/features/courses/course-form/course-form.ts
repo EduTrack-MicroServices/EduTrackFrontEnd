@@ -88,6 +88,9 @@ export class CourseFormComponent implements OnInit {
     }
   }
 
+  onCancel() {
+  window.history.back();
+}
   handleSuccess(msg: string) {
     toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
     
