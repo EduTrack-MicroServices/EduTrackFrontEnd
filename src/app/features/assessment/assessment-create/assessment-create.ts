@@ -154,7 +154,7 @@ export class AssessmentCreateComponent implements OnInit {
       this.api.updateAssessment(this.assessmentId, payload).subscribe({
         next: () => {
           toast.success('Assessment updated successfully');
-          this.router.navigate(['/courses', this.courseId]);
+         window.history.back();
         },
         error: (err) => this.handleError(err)
       });
@@ -162,7 +162,7 @@ export class AssessmentCreateComponent implements OnInit {
       this.api.createAssessment(payload).subscribe({
         next: () => {
           toast.success('Assessment created successfully');
-          this.router.navigate(['/courses', this.courseId]);
+        window.history.back();
         },
         error: (err) => this.handleError(err)
       });
