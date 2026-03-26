@@ -77,6 +77,15 @@ userRole = signal<string | null>(localStorage.getItem('role') || null);
   rejectInstructor(email: string) {
     return this.http.put<ApiResponse<null>>(`${this.apiUrl}/users/reject/${email}`, {});
   }
+  getUserProfile(userId: number) {
+    return this.http.get<ApiResponse<UserResponse>>(`${this.apiUrl}/users/getUser/${userId}`);
+  }
+
+  // Change password endpoint
+  changePassword(passwordData: any) {
+    // Expected payload: { userId, currentPassword, newPassword }
+    return this.http.put<ApiResponse<null>>(`${this.apiUrl}/users/changePassword`, passwordData);
+  }
 
   logout() {
     localStorage.clear();

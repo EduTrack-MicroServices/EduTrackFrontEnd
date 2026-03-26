@@ -1,7 +1,6 @@
 <aside class="sidebar shadow-soft" [class.collapsed]="isCollapsed()">
   
   <div class="sidebar-header d-flex align-items-center" [ngClass]="isCollapsed() ? 'justify-content-center' : 'justify-content-between'">
-    
     @if (!isCollapsed()) {
       <a routerLink="/dashboard" class="brand-link">
         <img src="/logo.png" alt="EduTrack" class="full-logo">
@@ -30,6 +29,12 @@
   }
 
   <nav class="nav-menu mt-2 mb-auto">
+    
+    <a routerLink="/profile" routerLinkActive="active" class="nav-pill">
+      <i class="bi bi-person-circle nav-icon"></i>
+      @if (!isCollapsed()) { <span class="nav-text">My Profile</span> }
+    </a>
+
     <a routerLink="/dashboard" routerLinkActive="active" class="nav-pill">
       <i class="bi bi-grid-fill nav-icon"></i>
       @if (!isCollapsed()) { <span class="nav-text">Dashboard</span> }
@@ -41,18 +46,47 @@
     </a>
 
     @if (userRole() === 'STUDENT') {
-      <a routerLink="/analysispage" routerLinkActive="active" class="nav-pill">
+      <a [routerLink]="['/analysispage', loggedInUserId()]" routerLinkActive="active" class="nav-pill">
         <i class="bi bi-pie-chart-fill nav-icon"></i>
         @if (!isCollapsed()) { <span class="nav-text">My Analysis</span> }
       </a>
     }
 
+    @if (userRole() === 'ADMIN' || userRole() === 'INSTRUCTOR') {
+      <a routerLink="/student-progress" routerLinkActive="active" class="nav-pill">
+        <i class="bi bi-person-vcard nav-icon"></i>
+        @if (!isCollapsed()) { <span class="nav-text">Student Progress</span> }
+      </a>
+    }
+
     @if (userRole() === 'ADMIN') {
       @if (!isCollapsed()) { <p class="nav-label mt-4">Management</p> }
+      
       <a routerLink="/admin-dashboard" routerLinkActive="active" class="nav-pill">
         <i class="bi bi-shield-lock-fill nav-icon"></i>
         @if (!isCollapsed()) { <span class="nav-text">Admin Console</span> }
       </a>
+
+      @if (!isCollapsed()) {
+        <div class="module-tree">
+          <div class="module-node" (click)="toggleAdminModule('USERS')" [class.active]="hasView('USERS')">
+            <div class="node-dot"></div>
+            <span class="node-text">User Management</span>
+          </div>
+          <div class="module-node" (click)="toggleAdminModule('ENROLLMENTS')" [class.active]="hasView('ENROLLMENTS')">
+            <div class="node-dot"></div>
+            <span class="node-text">Enrollments Management</span>
+          </div>
+          <div class="module-node" (click)="toggleAdminModule('STUDENT_ATTENDANCE')" [class.active]="hasView('STUDENT_ATTENDANCE')">
+            <div class="node-dot"></div>
+            <span class="node-text">Student Attendance</span>
+          </div>
+          <div class="module-node" (click)="toggleAdminModule('STAFF_ATTENDANCE')" [class.active]="hasView('STAFF_ATTENDANCE')">
+            <div class="node-dot"></div>
+            <span class="node-text">Staff & Admin Attendance</span>
+          </div>
+        </div>
+      }
     }
   </nav>
 
@@ -62,5 +96,4 @@
       @if (!isCollapsed()) { <span class="nav-text">Sign Out</span> }
     </a>
   </div>
-
 </aside>
