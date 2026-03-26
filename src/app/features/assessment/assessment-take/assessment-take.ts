@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AssessmentService } from '../../../core/services/assessment-service';
 import { AuthService } from '../../../core/services/auth';
+import { toast } from 'ngx-sonner';
 
 @Component({
   standalone: true,
@@ -59,7 +60,10 @@ export class AssessmentTakeComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: () => (this.isLoading = false),
+      error: () => {
+        this.isLoading = false;
+        toast.error('Failed to load quiz questions');
+      },
     });
   }
 
@@ -68,6 +72,7 @@ export class AssessmentTakeComponent implements OnInit {
       this.questions.length > 0 && Object.keys(this.userAnswers).length === this.questions.length
     );
   }
+
   private generateFeedback(score: number, total: number): string {
     const percentage = (score / total) * 100;
 
@@ -85,6 +90,7 @@ export class AssessmentTakeComponent implements OnInit {
   submitQuiz() {
     if (!this.isQuizComplete) {
       this.errorMessage = 'Please answer all mandatory questions.';
+      toast.warning(this.errorMessage);
       return;
     }
 
@@ -92,6 +98,7 @@ export class AssessmentTakeComponent implements OnInit {
 
     if (!userId) {
       this.errorMessage = 'User session not found. Please log in again.';
+      toast.error(this.errorMessage);
       return;
     }
 
@@ -109,42 +116,58 @@ export class AssessmentTakeComponent implements OnInit {
       };
     });
 
-    // 2. Generate the dynamic feedback string
     const dynamicFeedback = this.generateFeedback(totalPoints, totalQuestions);
 
-    // 3. Prepare payload with the dynamic feedback
     const submissionData = {
       assessmentId: this.assessmentId,
       userId: userId,
       submittedDate: new Date().toISOString(),
       score: totalPoints,
-      feedback: dynamicFeedback, // Now contains the score-based message
+      feedback: dynamicFeedback,
     };
 
-    // 4. Logic: Find existing submission first
+    // Show loading toast for the submission process
+    const loadingToast = toast.loading('Submitting your assessment...');
+
     this.api.checkSubmission(userId, this.assessmentId).subscribe({
       next: (res: any) => {
         if (res.success && res.data) {
           const existingSubmissionId = res.data.submissionId;
 
           this.api.updateSubmission(existingSubmissionId, submissionData).subscribe({
-            next: () => this.navigateToResult(totalPoints, reviewData, dynamicFeedback),
-            error: () => (this.errorMessage = 'Failed to update existing submission.'),
+            next: () => {
+              toast.dismiss(loadingToast);
+              toast.success('Assessment updated successfully');
+              this.navigateToResult(totalPoints, reviewData, dynamicFeedback);
+            },
+            error: () => {
+              toast.dismiss(loadingToast);
+              this.errorMessage = 'Failed to update existing submission.';
+              toast.error(this.errorMessage);
+            },
           });
         } else {
-          this.createNewSubmission(submissionData, totalPoints, reviewData, dynamicFeedback);
+          this.createNewSubmission(submissionData, totalPoints, reviewData, dynamicFeedback, loadingToast);
         }
       },
-      error: (err) => {
-        this.createNewSubmission(submissionData, totalPoints, reviewData, dynamicFeedback);
+      error: () => {
+        this.createNewSubmission(submissionData, totalPoints, reviewData, dynamicFeedback, loadingToast);
       },
     });
   }
 
-  private createNewSubmission(data: any, score: number, review: any[], feedback: string) {
+  private createNewSubmission(data: any, score: number, review: any[], feedback: string, loadingId?: any) {
     this.api.createSubmission(data).subscribe({
-      next: () => this.navigateToResult(score, review, feedback),
-      error: () => (this.errorMessage = 'Failed to save submission.'),
+      next: () => {
+        if (loadingId) toast.dismiss(loadingId);
+        toast.success('Assessment submitted successfully');
+        this.navigateToResult(score, review, feedback);
+      },
+      error: () => {
+        if (loadingId) toast.dismiss(loadingId);
+        this.errorMessage = 'Failed to save submission.';
+        toast.error(this.errorMessage);
+      },
     });
   }
 
@@ -156,18 +179,15 @@ export class AssessmentTakeComponent implements OnInit {
         total: this.questions.length,
         passed: score >= this.questions.length * 0.4,
         review: review,
-        feedback: feedback, // Pass it to the result page to display there too
+        feedback: feedback,
       },
     });
   }
-  // Inside your AssessmentTakeComponent class
 
-  /** Returns the number of questions answered so far */
   get answeredCount(): number {
     return Object.keys(this.userAnswers).length;
   }
 
-  /** Returns the progress as a percentage (0 to 100) */
   get progress(): number {
     if (this.questions.length === 0) return 0;
     return (this.answeredCount / this.questions.length) * 100;

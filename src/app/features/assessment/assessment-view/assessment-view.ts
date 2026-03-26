@@ -5,6 +5,7 @@ import { Assessment } from '../../../core/models/assessment';
 import { Submission } from '../../../core/models/submission';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth'; 
+import { toast } from 'ngx-sonner'; // Import toast
 
 @Component({
   standalone: true,
@@ -50,38 +51,39 @@ export class AssessmentViewComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error loading assessment:', err);
         this.isLoading = false;
+        toast.error('Could not load assessment details', {
+          description: 'Please try again later or contact your instructor.'
+        });
         this.cdr.detectChanges();
       }
     });
   }
 
   private verifyUserSubmission(userId: number, assessmentId: number) {
-  this.api.checkSubmission(userId, assessmentId).subscribe({
-    next: (res: any) => {
-      // res is your ApiResponse DTO
-      if (res.success && res.data) {
-        // If your backend returns a single object or a list of submissions:
-        // We'll treat it as a single object for the "Latest" view 
-        // and you can loop it if it's a list for history.
-        this.submissionData = res.data;
-        this.isAlreadySubmitted = true;
-      } else {
-        // success: false or data: null (e.g., 404 handled within a 200 OK)
+    this.api.checkSubmission(userId, assessmentId).subscribe({
+      next: (res: any) => {
+        if (res.success && res.data) {
+          this.submissionData = res.data;
+          this.isAlreadySubmitted = true;
+          // Optional: Subtle notification that they've already completed this
+          toast.info('You have already submitted this assessment.');
+        } else {
+          this.isAlreadySubmitted = false;
+          this.submissionData = null;
+        }
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
         this.isAlreadySubmitted = false;
         this.submissionData = null;
+        this.isLoading = false;
+        // Logic error on submission check usually shouldn't block the view, 
+        // but we notify the user if the check fails.
+        toast.error('Error checking submission status');
+        this.cdr.detectChanges();
       }
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      // Catches actual HTTP errors (400, 404, 500)
-      this.isAlreadySubmitted = false;
-      this.submissionData = null;
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }
-  });
-}
+    });
+  }
 }

@@ -127,17 +127,20 @@ export const routes: Routes = [
         path: 'courses/:courseId/assessment/score', component: AssessmentScoreComponent
     },
     {
-        path: 'courses/:courseId/assessment/create', component: AssessmentCreateComponent
-    },
-    {
-        path: 'courses/:courseId/assessment', component: AssessmentViewComponent
-    },
-    {
-        path: 'courses/:courseId/assessment/:assessmentId/take', component: AssessmentTakeComponent
-    },
-    {
-        path: 'courses/:courseId/assessment/result', component: AssessmentScoreComponent
-    },
+  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
+},
+{
+  path: 'courses/:courseId/assessment/:assessmentId/edit',component:AssessmentCreateComponent
+},
+{
+  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
+},
+{
+  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
+},
+{
+  path: 'courses/:courseId/assessment/result',component: AssessmentScoreComponent
+},
     {
         path: '', redirectTo: 'home', pathMatch: 'full'
     }
