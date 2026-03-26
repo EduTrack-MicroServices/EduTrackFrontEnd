@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { CommonModule, Location } from '@angular/common'; 
+import { RouterLink, ActivatedRoute } from '@angular/router'; 
 import { AnalysisService } from '../../core/services/analysis';
 import { AuthService } from '../../core/services/auth';
 import { AssessmentService } from '../../core/services/assessment-service';
@@ -29,9 +29,15 @@ export class Analysispage implements OnInit {
   private analysisService = inject(AnalysisService);
   private assessmentService = inject(AssessmentService);
   private courseService = inject(CourseService);
+  
+  // Inject Route to read studentId, and Location to go back
+  private route = inject(ActivatedRoute);
+  private location = inject(Location);
 
   isLoading = signal<boolean>(true);
   userId = 0; 
+  isStaffViewing = signal<boolean>(false); // Tracks if viewed by Admin/Instructor
+
   submissions = signal<DetailedSubmission[]>([]);
   averageScore = signal<number>(0);
   highestScore = signal<number>(0);
@@ -73,13 +79,35 @@ export class Analysispage implements OnInit {
   };
 
   ngOnInit() {
-    this.userId = this.authService.getUserId();
+    // 1. Check if the user is an Admin or Instructor
+    const role = this.authService.userRole();
+    if (role === 'ADMIN' || role === 'INSTRUCTOR') {
+      this.isStaffViewing.set(true);
+    }
+
+    // 2. Check if a specific student ID was passed in the URL
+    const routeStudentId = this.route.snapshot.paramMap.get('studentId');
+    
+    if (routeStudentId) {
+      // If an ID is passed, load that specific student
+      this.userId = Number(routeStudentId);
+    } else {
+      // Otherwise, load the currently logged-in user
+      this.userId = this.authService.getUserId();
+    }
+
     if (this.userId === 0) {
       toast.error('Session Expired', { description: 'Please log in to view your analysis.' });
       this.isLoading.set(false);
       return;
     }
+    
     this.loadAnalysisData();
+  }
+
+  // Navigate back to the previous page (Student Directory)
+  goBack() {
+    this.location.back();
   }
 
   loadAnalysisData() {
@@ -89,7 +117,6 @@ export class Analysispage implements OnInit {
           const detailCalls = res.data.map(sub => 
             this.assessmentService.getAssessmentById(sub.assessmentId).pipe(
               switchMap(assessRes => {
-                // Get courseId from nested data property
                 const courseId = assessRes.data?.courseId;
 
                 if (!courseId) {
@@ -99,7 +126,6 @@ export class Analysispage implements OnInit {
                 return this.courseService.getCourseById(courseId).pipe(
                   map(courseRes => ({
                     ...sub,
-                    // FIX: access name through courseRes.data
                     courseName: courseRes.data?.name || 'Unknown Course'
                   } as DetailedSubmission)),
                   catchError(() => of({ ...sub, courseName: 'Course Error' } as DetailedSubmission))

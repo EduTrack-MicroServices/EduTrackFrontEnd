@@ -31,422 +31,437 @@
     </div>
   </div>
 
-  <div class="card shadow-sm border-0 overflow-hidden">
-    <div class="card-header bg-white py-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <h5 class="mb-0 fw-bold">User Management</h5>
-          <small class="text-muted">Viewing registered users. Use the filter to narrow down.</small>
-        </div>
-      </div>
-      
-      <div class="row g-3">
-        <div class="col-md-4">
-          <div class="form-floating">
-            <select class="form-select border-secondary shadow-sm" id="roleFilter"
-                    [ngModel]="selectedUserRole()" 
-                    (ngModelChange)="selectedUserRole.set($event)">
-              <option value="">All Roles</option>
-              <option value="ADMIN">Admin</option>
-              <option value="INSTRUCTOR">Instructor</option>
-              <option value="STUDENT">Student</option>
-            </select>
-            <label for="roleFilter" class="fw-bold text-secondary">
-              <i class="bi bi-funnel me-1"></i> Filter by Role
-            </label>
+  <div class="d-flex flex-column gap-4">
+    
+    @for (view of activeViews(); track view) {
+
+      @if (view === 'USERS') {
+        <div class="card shadow-sm border-0 overflow-hidden">
+          <div class="card-header bg-white py-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="mb-0 fw-bold">User Management</h5>
+                <small class="text-muted">Viewing registered users. Use the filter to narrow down.</small>
+              </div>
+            </div>
+            
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <select class="form-select border-secondary shadow-sm" id="roleFilter"
+                          [ngModel]="selectedUserRole()" 
+                          (ngModelChange)="selectedUserRole.set($event)">
+                    <option value="">All Roles</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="INSTRUCTOR">Instructor</option>
+                    <option value="STUDENT">Student</option>
+                  </select>
+                  <label for="roleFilter" class="fw-bold text-secondary">
+                    <i class="bi bi-funnel me-1"></i> Filter by Role
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-4">User Details</th>
+                    <th>Contact Info</th>
+                    <th>Role</th>
+                    <th>Account Status</th>
+                    <th class="text-center">Accept / Reject</th>
+                    <th class="text-end pe-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of filteredUsers(); track user.userId) {
+                    <tr>
+                      <td class="ps-4">
+                        <div class="d-flex align-items-center">
+                          <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
+                            <i class="bi bi-person-fill"></i>
+                          </div>
+                          <div>
+                            <div class="fw-bold">{{ user.userName }}</div>
+                            <div class="small text-muted">ID: #{{ user.userId }}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="small text-dark">{{ user.email }}</div>
+                        <div class="small text-muted">{{ user.phoneNumber }}</div>
+                      </td>
+                      <td>
+                        <span class="badge rounded-pill px-3" 
+                          [ngClass]="user.role === 'ADMIN' ? 'bg-danger' : (user.role === 'INSTRUCTOR' ? 'bg-info' : 'bg-success')">
+                          {{ user.role }}
+                        </span>
+                      </td>
+                      
+                      <td>
+                        <span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center shadow-sm" 
+                          [ngClass]="{
+                            'badge-glass-pending': user.accountStatus.toUpperCase() === 'PENDING',
+                            'badge-glass-success': user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE',
+                            'badge-glass-danger': user.accountStatus.toUpperCase() === 'REJECTED'
+                          }">
+                          <i class="me-2" style="font-size: 0.85rem;" [ngClass]="{
+                            'bi bi-hourglass-split': user.accountStatus.toUpperCase() === 'PENDING',
+                            'bi bi-check-circle-fill': user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE',
+                            'bi bi-x-circle-fill': user.accountStatus.toUpperCase() === 'REJECTED'
+                          }"></i>
+                          {{ (user.accountStatus || 'Pending') | uppercase }}
+                        </span>
+                      </td>
+
+                      <td class="text-center">
+                        @if (user.role === 'INSTRUCTOR') {
+                          <div class="d-flex justify-content-center gap-2">
+                            
+                            @if (user.accountStatus.toUpperCase() === 'PENDING') {
+                              <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
+                                <i class="bi bi-check-lg me-1"></i> Accept
+                              </button>
+                              <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" (click)="rejectInstructor(user.email)">
+                                <i class="bi bi-x-lg me-1"></i> Reject
+                              </button>
+                            } 
+                            
+                            @else if (user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE') {
+                              <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" (click)="rejectInstructor(user.email)">
+                                <i class="bi bi-x-lg me-1"></i> Reject
+                              </button>
+                            } 
+                            
+                            @else if (user.accountStatus.toUpperCase() === 'REJECTED') {
+                              <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
+                                <i class="bi bi-check-lg me-1"></i> Accept
+                              </button>
+                            }
+                          </div>
+                        } @else {
+                          <span class="text-muted small">-</span>
+                        }
+                      </td>
+
+                      <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" 
+                                (click)="deleteUser(user.userId)" 
+                                title="Delete User"
+                                style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="text-center p-5 text-muted">
+                        <i class="bi bi-person-x text-secondary d-block fs-2 mb-2"></i>
+                        No users found for the selected role.
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th class="ps-4">User Details</th>
-              <th>Contact Info</th>
-              <th>Role</th>
-              <th>Account Status</th>
-              <th class="text-center">Accept / Reject</th>
-              <th class="text-end pe-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (user of filteredUsers(); track user.userId) {
-              <tr>
-                <td class="ps-4">
-                  <div class="d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
-                      <i class="bi bi-person-fill"></i>
-                    </div>
-                    <div>
-                      <div class="fw-bold">{{ user.userName }}</div>
-                      <div class="small text-muted">ID: #{{ user.userId }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="small text-dark">{{ user.email }}</div>
-                  <div class="small text-muted">{{ user.phoneNumber }}</div>
-                </td>
-                <td>
-                  <span class="badge rounded-pill px-3" 
-                    [ngClass]="user.role === 'ADMIN' ? 'bg-danger' : (user.role === 'INSTRUCTOR' ? 'bg-info' : 'bg-success')">
-                    {{ user.role }}
-                  </span>
-                </td>
-                
-                <td>
-                  <span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center shadow-sm" 
-                    [ngClass]="{
-                      'badge-glass-pending': user.accountStatus.toUpperCase() === 'PENDING',
-                      'badge-glass-success': user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE',
-                      'badge-glass-danger': user.accountStatus.toUpperCase() === 'REJECTED'
-                    }">
-                    <i class="me-2" style="font-size: 0.85rem;" [ngClass]="{
-                      'bi bi-hourglass-split': user.accountStatus.toUpperCase() === 'PENDING',
-                      'bi bi-check-circle-fill': user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE',
-                      'bi bi-x-circle-fill': user.accountStatus.toUpperCase() === 'REJECTED'
-                    }"></i>
-                    {{ (user.accountStatus || 'Pending') | uppercase }}
-                  </span>
-                </td>
+      }
 
-                <td class="text-center">
-                  @if (user.role === 'INSTRUCTOR') {
-                    <div class="d-flex justify-content-center gap-2">
-                      
-                      @if (user.accountStatus.toUpperCase() === 'PENDING') {
-                        <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
-                          <i class="bi bi-check-lg me-1"></i> Accept
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" (click)="rejectInstructor(user.email)">
-                          <i class="bi bi-x-lg me-1"></i> Reject
-                        </button>
-                      } 
-                      
-                      @else if (user.accountStatus.toUpperCase() === 'APPROVED' || user.accountStatus.toUpperCase() === 'ACTIVE') {
-                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" (click)="rejectInstructor(user.email)">
-                          <i class="bi bi-x-lg me-1"></i> Reject
-                        </button>
-                      } 
-                      
-                      @else if (user.accountStatus.toUpperCase() === 'REJECTED') {
-                        <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-bold" (click)="approveInstructor(user.email)">
-                          <i class="bi bi-check-lg me-1"></i> Accept
-                        </button>
+      @if (view === 'ENROLLMENTS') {
+        <div class="card shadow-sm border-0 overflow-hidden">
+          <div class="card-header bg-white py-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="mb-0 fw-bold">Enrollment Management</h5>
+                <small class="text-muted">Viewing all enrollments. Use filters to narrow down.</small>
+              </div>
+              <button class="btn btn-sm btn-light border shadow-sm rounded-pill px-3" (click)="loadAllEnrollments()">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+              </button>
+            </div>
+            
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <select class="form-select border-primary shadow-sm" id="studentFilter"
+                          [ngModel]="selectedStudentId()" 
+                          (ngModelChange)="selectedStudentId.set($event); onStudentFilterChange($event)">
+                    <option value="">Show All Students</option>
+                    @for (user of users(); track user.userId) {
+                      @if(user.role === 'STUDENT') {
+                        <option [value]="user.userId">{{ user.userName }} (ID: {{ user.userId }})</option>
                       }
-                    </div>
+                    }
+                  </select>
+                  <label for="studentFilter" class="fw-bold text-primary">
+                    <i class="bi bi-person me-1"></i> Filter by Student
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <select class="form-select border-info shadow-sm" id="programFilter"
+                          [ngModel]="selectedProgramId()" 
+                          (ngModelChange)="selectedProgramId.set($event); onProgramFilterChange($event)">
+                    <option value="">Show All Programs</option>
+                    @for (prog of programs(); track prog.programId) {
+                      <option [value]="prog.programId">{{ prog.name }} (ID: {{ prog.programId }})</option>
+                    }
+                  </select>
+                  <label for="programFilter" class="fw-bold text-info">
+                    <i class="bi bi-book me-1"></i> Filter by Program
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-4">Enrollment ID</th>
+                    <th>Student Details</th>
+                    <th>Program Details</th>
+                    <th>Status</th>
+                    <th>Enrollment Date</th>
+                    <th class="text-end pe-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (enrollmentLoading()) {
+                    <tr>
+                      <td colspan="6" class="text-center p-5 text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                        Loading enrollments...
+                      </td>
+                    </tr>
                   } @else {
-                    <span class="text-muted small">-</span>
+                    @for (enr of enrollments(); track enr.enrollmentId) {
+                      <tr>
+                        <td class="ps-4 fw-bold text-muted">#{{ enr.enrollmentId }}</td>
+                        
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
+                              <i class="bi bi-person-badge"></i>
+                            </div>
+                            <div>
+                              <div class="fw-bold">{{ getUserName(enr.userId) }}</div>
+                              <div class="small text-muted">ID: #{{ enr.userId }}</div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 me-3">
+                              <i class="bi bi-journal-bookmark"></i>
+                            </div>
+                            <div>
+                              <div class="fw-bold">{{ getProgramName(enr.programId) }}</div>
+                              <div class="small text-muted">ID: #{{ enr.programId }}</div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td>
+                          <span class="badge rounded-pill px-3 py-2 shadow-sm" 
+                                [ngClass]="enr.status === 'Active' ? 'badge-glass-success' : (enr.status === 'Completed' ? 'badge-glass-primary' : 'badge-glass-danger')">
+                            {{ enr.status }}
+                          </span>
+                        </td>
+                        <td class="small text-muted">{{ enr.enrolledDate | date:'mediumDate' }}</td>
+                        <td class="text-end pe-4">
+                          <button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" 
+                                  (click)="deleteEnrollmentRecord(enr.enrollmentId)" 
+                                  title="Delete Enrollment"
+                                  style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="6" class="text-center p-5 text-muted">
+                          <i class="bi bi-folder-x text-secondary d-block fs-2 mb-2"></i>
+                          No enrollments found.
+                        </td>
+                      </tr>
+                    }
                   }
-                </td>
-
-                <td class="text-end pe-4">
-                  <button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" 
-                          (click)="deleteUser(user.userId)" 
-                          title="Delete User"
-                          style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="6" class="text-center p-5 text-muted">
-                  <i class="bi bi-person-x text-secondary d-block fs-2 mb-2"></i>
-                  No users found for the selected role.
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="card shadow-sm border-0 overflow-hidden mt-4">
-    <div class="card-header bg-white py-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <h5 class="mb-0 fw-bold">Enrollment Management</h5>
-          <small class="text-muted">Viewing all enrollments. Use filters to narrow down.</small>
-        </div>
-        <button class="btn btn-sm btn-light border shadow-sm rounded-pill px-3" (click)="loadAllEnrollments()">
-          <i class="bi bi-arrow-clockwise me-1"></i> Refresh
-        </button>
-      </div>
-      
-      <div class="row g-3">
-        <div class="col-md-6">
-          <div class="form-floating">
-            <select class="form-select border-primary shadow-sm" id="studentFilter"
-                    [ngModel]="selectedStudentId()" 
-                    (ngModelChange)="selectedStudentId.set($event); onStudentFilterChange($event)">
-              <option value="">Show All Students</option>
-              @for (user of users(); track user.userId) {
-                @if(user.role === 'STUDENT') {
-                  <option [value]="user.userId">{{ user.userName }} (ID: {{ user.userId }})</option>
-                }
-              }
-            </select>
-            <label for="studentFilter" class="fw-bold text-primary">
-              <i class="bi bi-person me-1"></i> Filter by Student
-            </label>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
+      }
 
-        <div class="col-md-6">
-          <div class="form-floating">
-            <select class="form-select border-info shadow-sm" id="programFilter"
-                    [ngModel]="selectedProgramId()" 
-                    (ngModelChange)="selectedProgramId.set($event); onProgramFilterChange($event)">
-              <option value="">Show All Programs</option>
-              @for (prog of programs(); track prog.programId) {
-                <option [value]="prog.programId">{{ prog.name }} (ID: {{ prog.programId }})</option>
-              }
-            </select>
-            <label for="programFilter" class="fw-bold text-info">
-              <i class="bi bi-book me-1"></i> Filter by Program
-            </label>
+      @if (view === 'STUDENT_ATTENDANCE') {
+        <div class="card shadow-sm border-0 overflow-hidden">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Student Attendance Overview</h5>
+            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="loadAllAttendances()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Sync Attendance
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-4">Student Details</th>
+                    <th>Role</th>
+                    <th class="text-center">Total Days</th>
+                    <th class="text-center">Present</th>
+                    <th class="text-center">Absent</th>
+                    <th>Attendance %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of users(); track user.userId) {
+                    @if(user.role === 'STUDENT') {
+                      <tr>
+                        <td class="ps-4">
+                          <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
+                              <i class="bi bi-person-badge"></i>
+                            </div>
+                            <div>
+                              <div class="fw-bold">{{ user.userName }}</div>
+                              <div class="small text-muted">ID: #{{ user.userId }}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="badge badge-glass-success rounded-pill px-3 py-2">{{ user.role }}</span>
+                        </td>
+
+                        @if (attendanceMap().get(user.userId); as attendance) {
+                          <td class="text-center fw-bold text-muted">{{ attendance.totalDays }}</td>
+                          <td class="text-center fw-bold text-success">{{ attendance.presentDays }}</td>
+                          <td class="text-center fw-bold text-danger">{{ attendance.absentDays }}</td>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <div class="progress w-100 me-2" style="height: 8px;">
+                                <div class="progress-bar bg-primary" 
+                                    role="progressbar" 
+                                    [style.width.%]="getAttendancePercentage(attendance.presentDays, attendance.totalDays)">
+                                </div>
+                              </div>
+                              <small class="fw-bold">{{ getAttendancePercentage(attendance.presentDays, attendance.totalDays) }}%</small>
+                            </div>
+                          </td>
+                        } @else {
+                          <td colspan="4" class="text-muted small">
+                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                            Fetching records...
+                          </td>
+                        }
+                      </tr>
+                    }
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="text-center p-5 text-muted">No students found.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th class="ps-4">Enrollment ID</th>
-              <th>Student Details</th>
-              <th>Program Details</th>
-              <th>Status</th>
-              <th>Enrollment Date</th>
-              <th class="text-end pe-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @if (enrollmentLoading()) {
-              <tr>
-                <td colspan="6" class="text-center p-5 text-muted">
-                  <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                  Loading enrollments...
-                </td>
-              </tr>
-            } @else {
-              @for (enr of enrollments(); track enr.enrollmentId) {
-                <tr>
-                  <td class="ps-4 fw-bold text-muted">#{{ enr.enrollmentId }}</td>
-                  
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
-                        <i class="bi bi-person-badge"></i>
-                      </div>
-                      <div>
-                        <div class="fw-bold">{{ getUserName(enr.userId) }}</div>
-                        <div class="small text-muted">ID: #{{ enr.userId }}</div>
-                      </div>
-                    </div>
-                  </td>
+      }
 
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="bg-info bg-opacity-10 text-info rounded-circle p-2 me-3">
-                        <i class="bi bi-journal-bookmark"></i>
-                      </div>
-                      <div>
-                        <div class="fw-bold">{{ getProgramName(enr.programId) }}</div>
-                        <div class="small text-muted">ID: #{{ enr.programId }}</div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>
-                    <span class="badge rounded-pill px-3 py-2 shadow-sm" 
-                          [ngClass]="enr.status === 'Active' ? 'badge-glass-success' : (enr.status === 'Completed' ? 'badge-glass-primary' : 'badge-glass-danger')">
-                      {{ enr.status }}
-                    </span>
-                  </td>
-                  <td class="small text-muted">{{ enr.enrolledDate | date:'mediumDate' }}</td>
-                  <td class="text-end pe-4">
-                    <button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" 
-                            (click)="deleteEnrollmentRecord(enr.enrollmentId)" 
-                            title="Delete Enrollment"
-                            style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="6" class="text-center p-5 text-muted">
-                    <i class="bi bi-folder-x text-secondary d-block fs-2 mb-2"></i>
-                    No enrollments found.
-                  </td>
-                </tr>
-              }
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="card shadow-sm border-0 overflow-hidden mt-4">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-      <h5 class="mb-0 fw-bold">Student Attendance Overview</h5>
-      <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="loadAllAttendances()">
-        <i class="bi bi-arrow-clockwise me-1"></i> Sync Attendance
-      </button>
-    </div>
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th class="ps-4">Student Details</th>
-              <th>Role</th>
-              <th class="text-center">Total Days</th>
-              <th class="text-center">Present</th>
-              <th class="text-center">Absent</th>
-              <th>Attendance %</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (user of users(); track user.userId) {
-              @if(user.role === 'STUDENT') {
-                <tr>
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
-                        <i class="bi bi-person-badge"></i>
-                      </div>
-                      <div>
-                        <div class="fw-bold">{{ user.userName }}</div>
-                        <div class="small text-muted">ID: #{{ user.userId }}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge badge-glass-success rounded-pill px-3 py-2">{{ user.role }}</span>
-                  </td>
-
-                  @if (attendanceMap().get(user.userId); as attendance) {
-                    <td class="text-center fw-bold text-muted">{{ attendance.totalDays }}</td>
-                    <td class="text-center fw-bold text-success">{{ attendance.presentDays }}</td>
-                    <td class="text-center fw-bold text-danger">{{ attendance.absentDays }}</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress w-100 me-2" style="height: 8px;">
-                          <div class="progress-bar bg-primary" 
-                               role="progressbar" 
-                               [style.width.%]="getAttendancePercentage(attendance.presentDays, attendance.totalDays)">
+      @if (view === 'STAFF_ATTENDANCE') {
+        <div class="card shadow-sm border-0 overflow-hidden">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <div>
+              <h5 class="mb-0 fw-bold">Staff Attendance Overview</h5>
+              <small class="text-muted">Admins and Instructors</small>
+            </div>
+            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="loadAllAttendances()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Sync Attendance
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-4">Staff Details</th>
+                    <th>Role</th>
+                    <th class="text-center">Total Days</th>
+                    <th class="text-center">Present</th>
+                    <th class="text-center">Absent</th>
+                    <th>Attendance %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (user of users(); track user.userId) {
+                    @if(user.role === 'ADMIN' || user.role === 'INSTRUCTOR') {
+                      <tr>
+                        <td class="ps-4">
+                          <div class="d-flex align-items-center">
+                            <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle p-2 me-3">
+                              <i class="bi bi-person-workspace"></i>
+                            </div>
+                            <div>
+                              <div class="fw-bold">{{ user.userName }}</div>
+                              <div class="small text-muted">ID: #{{ user.userId }}</div>
+                            </div>
                           </div>
-                        </div>
-                        <small class="fw-bold">{{ getAttendancePercentage(attendance.presentDays, attendance.totalDays) }}%</small>
-                      </div>
-                    </td>
-                  } @else {
-                    <td colspan="4" class="text-muted small">
-                      <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                      Fetching records...
-                    </td>
-                  }
-                </tr>
-              }
-            } @empty {
-              <tr>
-                <td colspan="6" class="text-center p-5 text-muted">No students found.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+                        </td>
+                        <td>
+                          <span class="badge rounded-pill px-3 py-2" 
+                                [ngClass]="user.role === 'ADMIN' ? 'badge-glass-danger' : 'badge-glass-primary'">
+                            {{ user.role }}
+                          </span>
+                        </td>
 
-  <div class="card shadow-sm border-0 overflow-hidden mt-4">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-      <div>
-        <h5 class="mb-0 fw-bold">Staff Attendance Overview</h5>
-        <small class="text-muted">Admins and Instructors</small>
-      </div>
-      <button class="btn btn-sm btn-outline-primary rounded-pill px-3" (click)="loadAllAttendances()">
-        <i class="bi bi-arrow-clockwise me-1"></i> Sync Attendance
-      </button>
-    </div>
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead class="table-light">
-            <tr>
-              <th class="ps-4">Staff Details</th>
-              <th>Role</th>
-              <th class="text-center">Total Days</th>
-              <th class="text-center">Present</th>
-              <th class="text-center">Absent</th>
-              <th>Attendance %</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (user of users(); track user.userId) {
-              @if(user.role === 'ADMIN' || user.role === 'INSTRUCTOR') {
-                <tr>
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle p-2 me-3">
-                        <i class="bi bi-person-workspace"></i>
-                      </div>
-                      <div>
-                        <div class="fw-bold">{{ user.userName }}</div>
-                        <div class="small text-muted">ID: #{{ user.userId }}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge rounded-pill px-3 py-2" 
-                          [ngClass]="user.role === 'ADMIN' ? 'badge-glass-danger' : 'badge-glass-primary'">
-                      {{ user.role }}
-                    </span>
-                  </td>
-
-                  @if (attendanceMap().get(user.userId); as attendance) {
-                    <td class="text-center fw-bold text-muted">{{ attendance.totalDays }}</td>
-                    <td class="text-center fw-bold text-success">{{ attendance.presentDays }}</td>
-                    <td class="text-center fw-bold text-danger">{{ attendance.absentDays }}</td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="progress w-100 me-2" style="height: 8px;">
-                          <div class="progress-bar" 
-                               [ngClass]="user.role === 'ADMIN' ? 'bg-primary' : 'bg-primary'"
-                               role="progressbar" 
-                               [style.width.%]="getAttendancePercentage(attendance.presentDays, attendance.totalDays)">
-                          </div>
-                        </div>
-                        <small class="fw-bold">{{ getAttendancePercentage(attendance.presentDays, attendance.totalDays) }}%</small>
-                      </div>
-                    </td>
-                  } @else {
-                    <td colspan="4" class="text-muted small">
-                      <div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div>
-                      Fetching records...
-                    </td>
+                        @if (attendanceMap().get(user.userId); as attendance) {
+                          <td class="text-center fw-bold text-muted">{{ attendance.totalDays }}</td>
+                          <td class="text-center fw-bold text-success">{{ attendance.presentDays }}</td>
+                          <td class="text-center fw-bold text-danger">{{ attendance.absentDays }}</td>
+                          <td>
+                            <div class="d-flex align-items-center">
+                              <div class="progress w-100 me-2" style="height: 8px;">
+                                <div class="progress-bar" 
+                                    [ngClass]="user.role === 'ADMIN' ? 'bg-primary' : 'bg-primary'"
+                                    role="progressbar" 
+                                    [style.width.%]="getAttendancePercentage(attendance.presentDays, attendance.totalDays)">
+                                </div>
+                              </div>
+                              <small class="fw-bold">{{ getAttendancePercentage(attendance.presentDays, attendance.totalDays) }}%</small>
+                            </div>
+                          </td>
+                        } @else {
+                          <td colspan="4" class="text-muted small">
+                            <div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div>
+                            Fetching records...
+                          </td>
+                        }
+                      </tr>
+                    }
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="text-center p-5 text-muted">No staff members found.</td>
+                    </tr>
                   }
-                </tr>
-              }
-            } @empty {
-              <tr>
-                <td colspan="6" class="text-center p-5 text-muted">No staff members found.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+
+    }
   </div>
 
 </div>
