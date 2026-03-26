@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AssessmentService } from '../../../core/services/assessment-service';
 import { AuthService } from '../../../core/services/auth';
+import { CourseService } from '../../../core/services/course-service';
 
 @Component({
   standalone: true,
@@ -38,6 +39,7 @@ export class AssessmentTakeComponent implements OnInit {
   private router = inject(Router);
   private auth = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
+  private courseService = inject(CourseService);
 
   courseId!: number;
   assessmentId!: number;
@@ -149,6 +151,32 @@ export class AssessmentTakeComponent implements OnInit {
   }
 
   private navigateToResult(score: number, review: any[], feedback: string) {
+
+    if (score >= this.questions.length * 0.4) {
+
+      console.log('Assessment passed, recording progress...');
+      // If passed, record the assessment pass in the progress API
+      const userId = Number(localStorage.getItem('userId')) || this.auth.getUserId(); 
+      this.courseService.recordAssessmentPass(userId, this.courseId, score).subscribe({
+        next: (res) => {
+          if (res.success) {  
+            // Optionally, you can check if the entire program is now completed
+
+            // this.courseService.getProgramProgress(programId, userId).subscribe({
+            //   next: (progRes) => {
+            //     if (progRes.success) {
+            //       const programCompleted = progRes.data.programCompleted;
+            //       // Pass this info to the result page if needed
+            //     }
+            // });
+          } 
+    }
+      });
+    }
+
+      
+
+
     this.router.navigate(['/courses', this.courseId, 'assessment', 'result'], {
       replaceUrl: true,
       state: {

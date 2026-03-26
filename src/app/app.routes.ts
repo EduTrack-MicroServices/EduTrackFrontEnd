@@ -62,7 +62,7 @@ export const routes: Routes = [
         path:'analysispage',
         component:Analysispage,
         canActivate: [authGuard, roleGuard],
-        data:{role:'STUDENT'}
+        data:{roles:['STUDENT']}
 
     },
 
@@ -104,10 +104,10 @@ export const routes: Routes = [
         path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer', 
         component: ModuleViewerComponent, canActivate: [authGuard]
     },
-    {
-            path: 'modules/:moduleId/add-content', 
-            component: ContentFormComponent, canActivate: [authGuard]
-    },
+   { path: 'modules/:moduleId/add-content', component: ContentFormComponent,canActivate: [authGuard]},
+{ path: 'modules/:moduleId/edit-content/:contentId', component: ContentFormComponent,canActivate: [authGuard] },
+
+
     {
   path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
 },

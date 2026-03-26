@@ -14,6 +14,11 @@ export class ContentService {
   getContentByModule(moduleId: number) {
     return this.http.get<ApiResponse<Content[]>>(`${this.baseUrl}/module/${moduleId}`);
   }
+  
+  getContentById(contentId:Number){
+    console.log("fetching content")
+    return this.http.get<ApiResponse<Content>>(`${this.baseUrl}/${contentId}`);
+  }
 
   saveContentByModule(moduleId: number, content: Content) {
     return this.http.post<ApiResponse<Content>>(`${this.baseUrl}/module/${moduleId}`, content);

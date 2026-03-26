@@ -38,14 +38,11 @@
                 {{ program.description || 'No description provided for this learning track.' }}
               </p>
 
-              <div class="d-flex align-items-center gap-3 mb-4 pt-3 border-top border-light">
-                <div class="small text-muted"><i class="bi bi-calendar3 me-1"></i> 12 Weeks</div>
-                <div class="small text-muted"><i class="bi bi-people me-1"></i> 1.2k Students</div>
-              </div>
+  
             </div>
             
-            <div class="card-footer bg-light border-0 p-3 d-flex gap-2">
-              <button class="btn btn-primary flex-grow-1 rounded-3 py-2 fw-bold shadow-sm" 
+            <div class="card-footer bg-primary-soft border-0 p-3 d-flex gap-2">
+              <button class="btn btn-dark flex-grow-1 rounded-3 py-2 fw-bold shadow-sm" 
                       [routerLink]="['/programs', program.programId]" 
                       [disabled]="program.status === 'INACTIVE'">
                 {{ program.status === 'INACTIVE' ? 'Unavailable' : 'Explore Program' }}

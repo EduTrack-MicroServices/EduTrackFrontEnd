@@ -44,5 +44,5 @@ export interface ProgramProgressResponse {
   completedCourses: number;
   totalCourses: number;
   completionPercentage: number;
-  isProgramCompleted: boolean;
+  programCompleted: boolean;
 }

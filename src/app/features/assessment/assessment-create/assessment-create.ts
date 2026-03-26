@@ -115,7 +115,9 @@ export class AssessmentCreateComponent implements OnInit {
 
     this.api.createAssessment(payload).subscribe({
       next: () => {
-        this.router.navigate(['/courses', this.courseId]);
+        // this.router.navigate(['/courses', this.courseId]);
+
+        window.history.back();
       },
       error: (err) => {
         // This captures the "Due date cannot be in the past" from your Java backend

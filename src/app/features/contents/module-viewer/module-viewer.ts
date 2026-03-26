@@ -58,26 +58,37 @@ export class ModuleViewerComponent implements OnInit {
     });
   }
 
+// Inside loadContents() method in module-viewer.component.ts
+
 loadContents() {
-    this.loading.set(true);
-    this.contentService.getContentByModule(this.moduleId).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.contents.set(res.data);
-          if (res.data.length > 0) {
-            this.selectContent(res.data[0]);
-          } else {
-            this.activeContent.set(null);
-          }
+  this.loading.set(true);
+  this.contentService.getContentByModule(this.moduleId).subscribe({
+    next: (res) => {
+      if (res.success) {
+        let rawData: Content[] = res.data;
+
+        // DRAFT FILTER LOGIC:
+        // If not an admin/instructor, show only Published items
+        if (!this.isEditor()) {
+          rawData = rawData.filter(item => item.status === 'Published');
         }
-        this.loading.set(false); // Stop loading regardless of success
-      },
-      error: (err) => {
-        console.error(err);
-        this.loading.set(false);
+
+        this.contents.set(rawData);
+
+        if (rawData.length > 0) {
+          this.selectContent(rawData[0]);
+        } else {
+          this.activeContent.set(null);
+        }
       }
-    });
-  }
+      this.loading.set(false);
+    },
+    error: (err) => {
+      console.error(err);
+      this.loading.set(false);
+    }
+  });
+}
 
   selectContent(content: Content) {
     this.activeContent.set(content);
@@ -89,8 +100,8 @@ loadContents() {
       next: (res) => {
         if (res.success) {
           this.isModuleCompleted.set(true);
-          toast.success('Welcome to EduTrack!', {
-                        description: 'You have successfully logged in.',
+          toast.success('Module Completed!', {
+                        description: 'Successfully marked module as completed.',
                         duration: 3500
                       });
         }

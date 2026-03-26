@@ -89,8 +89,8 @@ export class CourseFormComponent implements OnInit {
   }
 
   onCancel() {
-    this.router.navigate(['/programs', this.programId]);
-  }
+  window.history.back();
+}
   handleSuccess(msg: string) {
     toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
     

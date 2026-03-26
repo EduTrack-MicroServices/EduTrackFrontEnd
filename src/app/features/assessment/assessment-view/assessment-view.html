@@ -2,7 +2,10 @@
   <nav aria-label="breadcrumb" class="mb-5">
     <ol class="breadcrumb">
       <li class="breadcrumb-item">
-        <a [routerLink]="['/dashboard']" class="text-decoration-underline text-muted">Dashboard</a>
+        
+        <a (click)="goBack()" class="text-decoration-none text-muted fw-medium">
+          <button class="btn m-0 py-0">Go Back</button></a>
+       
       </li>
       <li class="breadcrumb-item active fw-bold text-dark">Assessment Details</li>
     </ol>

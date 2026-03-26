@@ -4,7 +4,7 @@
       {{ score }}<span class="text-muted fs-4">/{{ total }}</span>
     </div>
     <h3 class="fw-bold" [class.text-success]="passed" [class.text-danger]="!passed">
-      {{ passed ? 'Passed' : 'Needs Improvement' }}
+      {{ passed ? 'Passed' : 'Failed! Retry' }}
     </h3>
     <button class="btn btn-dark rounded-pill px-5 mt-3 shadow-sm" routerLink="/dashboard">
       Back to Dashboard

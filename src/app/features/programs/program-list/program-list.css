@@ -1,6 +1,7 @@
 /* Typography and Spacing */
 .text-gradient {
   background: linear-gradient(90deg, #0d6efd, #0099ff);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

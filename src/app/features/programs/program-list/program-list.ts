@@ -32,6 +32,7 @@ ngOnInit() {
     this.isLoading.set(true);
     this.courseService.getAllPrograms().subscribe({
       next: (res) => { 
+        this.isLoading.set(false);
         if (res.success) this.programs.set(res.data); 
       },
       error: () => {

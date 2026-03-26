@@ -84,4 +84,8 @@ export class AssessmentViewComponent implements OnInit {
     }
   });
 }
+
+goBack() {
+  window.history.back();      
+}
 }

@@ -1,192 +1,174 @@
-<div class="container py-5" *ngIf="course() as c">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb bg-transparent p-0">
-            <li class="breadcrumb-item">
-                <a [routerLink]="['/programs', pId]" class="text-decoration-none text-muted fw-medium">
-                    <i class="bi bi-grid-fill me-1"></i> Programs
-                </a>
-            </li>
-            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">{{ c.name }}</li>
-        </ol>
-    </nav>
+<div class="container py-4" *ngIf="course() as c">
+  <nav aria-label="breadcrumb" class="mb-4 animate__animated animate__fadeIn">
+    <ol class="breadcrumb bg-transparent p-0">
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/programs', pId]" class="text-decoration-none text-muted fw-medium">
+          <i class="bi bi-arrow-left-short"></i> Back to Program
+        </a>
+      </li>
+      <li class="breadcrumb-item active fw-bold text-dark">{{ c.name }}</li>
+    </ol>
+  </nav>
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5 bg-white">
-        <div class="row g-0">
-            <div class="col-md-8 p-5">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill small fw-bold">
-                        {{ c.status }}
-                    </span>
-                    <span class="text-muted small"><i class="bi bi-clock me-1"></i> Updated Mar 2026</span>
-                </div>
-                
-                <h1 class="display-5 fw-bold text-dark mb-3">{{ c.name }}</h1>
-                <p class="text-secondary fs-5 mb-4 leading-relaxed">{{ c.description }}</p>
-
-                <div class="d-flex flex-wrap gap-4 align-items-center">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-shape bg-soft-warning text-warning me-3">
-                            <i class="bi bi-star-fill"></i>
-                        </div>
-                        <div>
-                            <p class="mb-0 text-muted small">Credits</p>
-                            <p class="mb-0 fw-bold text-dark">{{ c.creditPoints }} Points</p>
-                        </div>
-                    </div>
-                    <div class="vr text-muted opacity-25 d-none d-md-block"></div>
-                    <div class="d-flex align-items-center">
-                        <div class="icon-shape bg-soft-info text-info me-3">
-                            <i class="bi bi-journal-text"></i>
-                        </div>
-                        <div>
-                            <p class="mb-0 text-muted small">Curriculum</p>
-                            <p class="mb-0 fw-bold text-dark">{{ modules().length }} Modules</p>
-                        </div>
-                    </div>
-                </div>
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5 bg-white">
+    <div class="card-body p-0">
+      <div class="row g-0">
+        <div class="col-lg-8 p-5 border-end">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="course-icon-bg shadow-sm">
+              <i class="bi bi-journal-code text-primary fs-3"></i>
             </div>
-            
-            <div class="col-md-4 bg-light d-flex align-items-center justify-content-center p-5 border-start border-light">
-                <div class="text-center w-100">
-                    @if (isEditor()) {
-                        <button class="btn btn-dark btn-lg w-100 rounded-3 mb-3 py-3 shadow-sm transition-hover" 
-                                [routerLink]="['/programs', pId, 'courses', courseId, 'add-module']">
-                            <i class="bi bi-plus-circle me-2"></i> Add New Module
-                        </button>
-                    }
-                    
-                    @if (!isEnrolled() && !isEditor()) {
-                        <div class="alert alert-warning border-0 small rounded-3 mb-0">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            Please enroll in the program to unlock this course content.
-                        </div>
-                    } @else {
-                        <p class="text-success small fw-bold mb-0">
-                            <i class="bi bi-shield-check me-1"></i> You have full access
-                        </p>
-                    }
-                </div>
+            <div>
+              <h1 class="fw-extrabold text-dark mb-0 tracking-tight">{{ c.name }}</h1>
+              <div class="d-flex gap-2 mt-1">
+                <span class="badge bg-light text-secondary border rounded-pill px-3">
+                  <i class="bi bi-stars me-1 text-warning"></i> {{ c.creditPoints }} Credits
+                </span>
+                @if (canTakeAssessment() && completedCount()>0) {
+                <span
+                  class="badge bg-success-subtle text-success border border-success rounded-pill px-3 animate__animated animate__pulse">
+                  <i class="bi bi-check-circle-fill me-1"></i> Curriculum Completed
+                </span>
+                }
+              </div>
+            </div>
+          </div>
+          <p class="text-secondary fs-5 lh-base mb-0">{{ c.description }}</p>
+        </div>
 
-                 <div class="row mt-4 pt-3 border-top">
-        <div class="col-12">
-          <div class="d-flex flex-wrap gap-3">
+        <div class="col-lg-4 p-5 bg-light-subtle d-flex flex-column justify-content-center">
+          <div class="action-card-inner">
             @if (isEditor()) {
+            <div class="d-grid gap-2">
+              <button class="btn btn-dark rounded-3 py-3 fw-bold shadow-sm hvr-lift"
+                [routerLink]="['/programs', pId, 'courses', courseId, 'add-module']">
+                <i class="bi bi-plus-lg me-2"></i>New Module
+              </button>
+
               @if (!hasAssessment) {
-                <button
-                  class="btn btn-outline-primary d-flex align-items-center px-4 py-2 border-2 rounded-3 shadow-sm transition-hover"
-                  [routerLink]="['/courses', courseId, 'assessment', 'create']"
-                >
-                  <i class="bi bi-journal-plus fs-4 me-2"></i>
-                  <div class="text-start">
-                    <span class="d-block fw-bold lh-1">Add Assessment</span>
-                    <small class="text-muted" style="font-size: 0.75rem">Create quiz & marks</small>
-                  </div>
-                </button>
+              <button class="btn btn-outline-primary border-2 rounded-3 py-3 fw-bold hvr-lift"
+                [routerLink]="['/courses', courseId, 'assessment', 'create']">
+                <i class="bi bi-patch-plus me-2"></i>Add Assessment
+              </button>
               } @else {
-                <button
-                  class="btn btn-primary d-flex align-items-center px-4 py-2 rounded-3 shadow-sm"
-                  [routerLink]="['/courses', courseId, 'assessment']"
-                >
-                  <i class="bi bi-eye fs-4 me-2"></i>
-                  <div class="text-start">
-                    <span class="d-block fw-bold lh-1">Show Assessment</span>
-                    <small class="text-white-50" style="font-size: 0.75rem">Manage quiz bank</small>
-                  </div>
-                </button>
+              <button class="btn btn-primary rounded-3 py-3 fw-bold hvr-lift shadow-sm"
+                [routerLink]="['/courses', courseId, 'assessment']">
+                <i class="bi bi-shield-check me-2"></i>Manage Quiz
+              </button>
               }
-            } @else if (hasAssessment) {
-              @if (!submission()) {
-                <button
-                  class="btn btn-success d-flex align-items-center px-4 py-2 rounded-3 shadow transition-hover"
-                  [routerLink]="['/courses', courseId, 'assessment']"
-                >
-                  <i class="bi bi-pencil-square fs-4 me-2"></i>
-                  <div class="text-start">
-                    <span class="d-block fw-bold lh-1">Take Assessment</span>
-                    <small class="text-white-50" style="font-size: 0.75rem"
-                      >Evaluate your learning</small
-                    >
-                  </div>
-                </button>
-              } @else if (submission().score < 4) {
-                <button
-                  class="btn btn-warning d-flex align-items-center px-4 py-2 rounded-3 shadow transition-hover text-dark"
-                  [routerLink]="['/courses', courseId, 'assessment']"
-                >
-                  <i class="bi bi-arrow-clockwise fs-4 me-2"></i>
-                  <div class="text-start">
-                    <span class="d-block fw-bold lh-1 text-dark">Retry Quiz</span>
-                    <small class="text-dark-50" style="font-size: 0.75rem"
-                      >Last Score: {{ submission().score }} - Failed</small
-                    >
-                  </div>
-                </button>
-              } @else {
-                <button
-                  class="btn btn-info d-flex align-items-center px-4 py-2 rounded-3 shadow transition-hover text-white"
-                  [routerLink]="['/courses', courseId, 'assessment']"
-                >
-                  <i class="bi bi-patch-check fs-4 me-2"></i>
-                  <div class="text-start">
-                    <span class="d-block fw-bold lh-1">Show Results</span>
-                    <small class="text-white-50" style="font-size: 0.75rem"
-                      >Score: {{ submission().score }} - Passed</small
-                    >
-                  </div>
-                </button>
-              }
+            </div>
+            } @else {
+      <div class="student-action-box">
+        @if (canTakeAssessment()) {
+          @if (hasAssessment) {
+            @if (!submission()) {
+               <div class="text-center mb-3">
+                 <h6 class="fw-bold text-dark mb-1">Final Step</h6>
+                 <p class="text-muted small">Pass the quiz to earn your credits.</p>
+               </div>
+               <button class="btn btn-success w-100 py-3 rounded-3 shadow fw-bold pulse-green"
+                 [routerLink]="['/courses', courseId, 'assessment']">
+                 Take Assessment <i class="bi bi-arrow-right ms-2"></i>
+               </button>
+            }@else if (submission().score < 4) { <div class="text-center mb-3">
+                <h6 class="fw-bold text-dark mb-1">Give another try</h6>
+                <p class="text-muted small">Pass the quiz to earn your credits.</p>
+            </div>
+            <button class="btn btn-warning w-100 py-3 rounded-3 shadow fw-bold text-dark hvr-lift"
+              [routerLink]="['/courses', courseId, 'assessment']">
+              Retry Assessment <i class="bi bi-arrow-clockwise ms-2"></i>
+            </button>
+            } @else {
+            <div class="text-center mb-3">
+              <h6 class="fw-bold text-dark mb-1">Good work!</h6>
+              <p class="text-muted small">You've passed the quiz.</p>
+            </div>
+            <button class="btn btn-info w-100 py-3 rounded-3 shadow fw-bold text-white hvr-lift"
+              [routerLink]="['/courses', courseId, 'assessment']">
+              View Results <i class="bi bi-award ms-2"></i>
+            </button>
+            }
+            }@else {
+            <div class="text-center">
+              <div class="lock-icon mb-2 text-success"><i class="bi bi-check-circle-fill"></i></div>
+              <p class="fw-bold text-dark mb-0">Modules Complete!</p>
+              <small class="text-muted">Waiting for instructor to open assessment.</small>
+            </div>
+          }
+        } @else {
+          <div class="locked-progress text-center animate__animated animate__fadeIn">
+            <div class="lock-icon mb-2"><i class="bi bi-lock-fill text-muted"></i></div>
+            <p class="fw-bold text-dark mb-2">Assessment Locked</p>
+            <div class="progress rounded-pill mb-2" style="height: 8px; background-color: #e9ecef;">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                [style.width.%]="(modules().length > 0) ? (completedCount() / modules().length) * 100 : 0">
+              </div>
+            </div>
+            <small class="text-muted">{{completedCount()}}/{{modules().length}} modules finished</small>
+          </div>
             }
           </div>
+          }
         </div>
       </div>
-            </div>
-        </div>
     </div>
+  </div>
+</div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <h3 class="fw-bold text-dark mb-4 d-flex align-items-center">
-                Course Curriculum
-                <span class="ms-3 badge bg-light text-muted fw-normal fs-6">{{ modules().length }} Steps</span>
-            </h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-extrabold text-dark mb-0">Course Modules</h4>
+  <span class="text-muted small fw-medium">{{ modules().length }} Lessons</span>
+</div>
 
-            <div class="curriculum-timeline">
-                @for (module of modules(); track module.moduleId; let i = $index) {
-                <div class="module-card card border-0 shadow-sm rounded-3 mb-3 overflow-hidden transition-hover">
-                    <div class="card-body p-4">
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <div class="step-number">{{ i + 1 }}</div>
-                            </div>
-                            <div class="col ms-2">
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <h5 class="mb-0 fw-bold text-dark">{{ module.name }}</h5>
-                                </div>
-                                <p class="mb-0 text-muted small text-truncate-2">
-                                    <span class="fw-bold text-dark-50">Objectives:</span> {{ module.learningObjectives }}
-                                </p>
-                            </div>
-                            <div class="col-auto d-flex align-items-center gap-3">
-                                @if (isEnrolled()) {
-                                    <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm btn-sm"
-                                            [routerLink]="['/programs', pId, 'courses', courseId, 'modules', module.moduleId, 'viewer']">
-                                        <i class="bi bi-play-fill me-1"></i> {{ isEditor() ? 'Manage' : 'Start' }}
-                                    </button>
-                                } @else {
-                                    <i class="bi bi-lock-fill text-muted fs-4"></i>
-                                }
+<div class="list-group list-group-flush shadow-sm rounded-4 overflow-hidden border">
+  @for (module of modules(); track module.moduleId; let i = $index) {
+  <div class="list-group-item p-4 border-bottom transition-all module-row">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <div class="step-pill">Lesson {{ i + 1 }}</div>
+      </div>
 
-                @if (isEditor()) {
-                <div class="btn-group shadow-sm bg-white">
-                    <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/modules/edit', module.moduleId]" title="Edit">
-                        <i class="bi bi-pencil text-warning"></i>
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" (click)="onDeleteModule(module.moduleId!)" title="Delete">
-                        <i class="bi bi-trash text-danger"></i>
-                    </button>
-                </div>
-                }
-            </div>
+      <div class="col ps-lg-4">
+        <h5 class="mb-1 fw-bold text-dark">{{ module.name }}</h5>
+        <p class="mb-0 text-muted small pe-lg-5">
+          <span class="fw-bold text-primary-emphasis">Goals:</span> {{ module.learningObjectives }}
+        </p>
+      </div>
+
+      <div class="col-auto d-flex align-items-center gap-2">
+        
+       @if (isEditor() || isEnrolled()) {
+    <button class="btn btn-primary rounded-pill px-4 btn-sm fw-bold hvr-lift"
+      [routerLink]="['/programs', pId, 'courses', courseId, 'modules', module.moduleId, 'viewer']">
+      {{ isEditor() ? 'Manage' : 'Start' }} <i class="bi bi-play-fill ms-1"></i>
+    </button>
+  } @else {
+    <span class="badge bg-light text-muted border px-3 py-2">
+      <i class="bi bi-lock me-1"></i> Locked! Please Enroll
+    </span>
+  }
+        @if (isEditor()) {
+        <div class="btn-group shadow-sm">
+          <button class="btn btn-white btn-sm border" [routerLink]="['/modules/edit', module.moduleId]">
+            <i class="bi bi-pencil text-warning"></i>
+          </button>
+          <button class="btn btn-white btn-sm border" (click)="onDeleteModule(module.moduleId!)">
+            <i class="bi bi-trash text-danger"></i>
+          </button>
         </div>
+        }
+      </div>
     </div>
+  </div>
+  } @empty {
+  <div class="bg-white text-center py-5 border-dashed rounded-4">
+    <div class="mb-3">
+      <i class="bi bi-cloud-arrow-up display-4 text-light-emphasis"></i>
+    </div>
+    <h5 class="fw-bold text-dark">Curriculum Draft in Progress</h5>
+    <p class="text-muted px-5">Exciting content for <span class="text-primary fw-bold">{{course()?.name}}</span> is
+      being prepared and will be uploaded shortly. Please check back soon!</p>
+  </div>
+  }
+</div>
 </div>

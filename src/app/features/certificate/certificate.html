@@ -1,0 +1,69 @@
+<div #certificate class="certificate-outer shadow-2xl position-relative overflow-hidden" 
+     style="width: 1123px; height: 794px; background: #fff;">
+    
+    <div class="watermark-overlay"></div>
+
+    <div class="corner-decoration top-left"></div>
+    <div class="corner-decoration top-right"></div>
+    <div class="corner-decoration bottom-left"></div>
+    <div class="corner-decoration bottom-right"></div>
+
+    <div class="certificate-content p-5 text-center h-100 d-flex flex-column justify-content-between">
+        
+        <div class="cert-header d-flex justify-content-center align-items-center gap-5 mt-4">
+            <div class="brand-logo edutrack">
+                <span class="fs-1 fw-black tracking-tighter">Edu<span class="text-primary">Track</span></span>
+            </div>
+            <div class="collaboration-line"></div>
+            <div class="brand-logo cognizant">
+                <span class="fs-2 fw-bold text-secondary">Cognizant</span>
+                <small class="d-block smaller text-muted text-uppercase tracking-widest">Digital Business</small>
+            </div>
+        </div>
+
+        <div class="cert-body">
+            <h4 class="text-uppercase tracking-widest text-gold mb-2 fw-bold">Professional Certification</h4>
+            <h3 class="display-4 fw-black text-navy mb-4 certificate-main-title">MASTER OF COMPLETION</h3>
+            
+            <p class="fs-4 text-muted fst-italic mb-1">This is to certify that</p>
+            
+            <div class="name-container my-2">
+                <h2 class="display-5 fw-bold text-navy name-text">{{ studentName | titlecase }}</h2>
+                <div class="name-underline"></div>
+            </div>
+
+            <p class="fs-5 text-muted mb-4 mx-auto" style="max-width: 700px;">
+                has successfully completed all courses and received passing grades for a professional certificate in
+            </p>
+            
+            <div class="program-box p-3 mb-4">
+                <h3 class="display-7 fw-bold text-navy">{{ programName }}</h3>
+            </div>
+        </div>
+
+        <div class="cert-footer d-flex justify-content-between align-items-end px-5 mb-4">
+            
+            <div class="signature-block text-start">
+                <p class="mb-0 text-navy fw-bold fs-5 signature-font">Harsha Babu</p>
+                <div class="sig-line mb-1"></div>
+                <p class="small text-muted mb-0 fw-bold">Program Director, EduTrack</p>
+                <small class="smaller text-muted">ID: ET-{{ programId }}-{{ completionDate | date:'yyyy' }}</small>
+            </div>
+
+            <div class="mastery-shield">
+                <div class="shield-inner">
+                    <i class="bi bi-shield-fill-check"></i>
+                    <span class="shield-text">VERIFIED</span>
+                </div>
+            </div>
+
+            <div class="signature-block text-end">
+                <p class="mb-0 text-muted small fw-bold">Verification Date</p>
+                <div class="sig-line mb-1"></div>
+                <p class="text-navy fw-bold mb-0">{{ completionDate | date:'longDate' }}</p>
+                <a class="smaller text-primary text-decoration-none">verify.edutrack.com/auth</a>
+            </div>
+
+        </div>
+    </div>
+</div>

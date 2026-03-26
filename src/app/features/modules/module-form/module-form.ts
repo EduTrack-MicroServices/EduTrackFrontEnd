@@ -88,9 +88,11 @@ export class ModuleFormComponent implements OnInit {
     }
   }
 
-  onCancel() {
-    this.router.navigate(['/programs', this.programId, 'courses', this.courseId]);
-  }
+
+    onCancel() {
+  window.history.back();
+}
+  
   private handleSuccess(msg: string) {
     toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
     
