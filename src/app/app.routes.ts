@@ -19,20 +19,22 @@ import { AssessmentViewComponent } from './features/assessment/assessment-view/a
 import { AssessmentCreateComponent } from './features/assessment/assessment-create/assessment-create';
 import { HomeComponent } from './features/home/home';
 import { Analysispage } from './features/analysispage/analysispage';
+import { Studentprogress } from './features/studentprogress/studentprogress';
+import { Profilepage } from './features/profilepage/profilepage';
 
 export const routes: Routes = [
     {
         path: 'login', component: LoginComponent
     },
     {
-        path:'home',component:HomeComponent
+        path: 'home', component: HomeComponent
     },
     {
         path: 'register', component: RegisterComponent
     },
     {
         path: 'dashboard', component: DashboardComponent,
-          canActivate: [authGuard],
+        canActivate: [authGuard],
 
     },
     {
@@ -59,12 +61,16 @@ export const routes: Routes = [
        data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
-        path:'analysispage',
-        component:Analysispage,
-        canActivate: [authGuard, roleGuard],
-        data:{roles:['STUDENT']}
-
+        path: 'student-progress',
+        component: Studentprogress,
+        canActivate: [authGuard]
     },
+    {
+        path: 'analysispage/:studentId',
+        component: Analysispage,
+        canActivate: [authGuard]
+    },
+    { path: 'profile', component: Profilepage },
 
     {
         path: 'programs/:id', component: ProgramDetailsComponent, canActivate: [authGuard]
@@ -82,7 +88,7 @@ export const routes: Routes = [
     {
         path: 'programs/:programId/courses/:courseId',
         component: CourseDetailsComponent, canActivate: [authGuard],
-    
+
     },
     {
         path: 'courses/:courseId',
@@ -101,7 +107,7 @@ export const routes: Routes = [
     },
 
     {
-        path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer', 
+        path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer',
         component: ModuleViewerComponent, canActivate: [authGuard]
     },
    { path: 'modules/:moduleId/add-content', component: ContentFormComponent,canActivate: [authGuard]},
@@ -109,19 +115,22 @@ export const routes: Routes = [
 
 
     {
-  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
-},
-{
-  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
-},
-{
-  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
-},
-{
-  path: 'courses/:courseId/assessment/score',component: AssessmentScoreComponent
-},
+        path: 'courses/:courseId/assessment/create', component: AssessmentCreateComponent
+    },
+    {
+        path: 'courses/:courseId/assessment', component: AssessmentViewComponent
+    },
+    {
+        path: 'courses/:courseId/assessment/:assessmentId/take', component: AssessmentTakeComponent
+    },
+    {
+        path: 'courses/:courseId/assessment/score', component: AssessmentScoreComponent
+    },
     {
   path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
+},
+{
+  path: 'courses/:courseId/assessment/:assessmentId/edit',component:AssessmentCreateComponent
 },
 {
   path: 'courses/:courseId/assessment',component: AssessmentViewComponent
