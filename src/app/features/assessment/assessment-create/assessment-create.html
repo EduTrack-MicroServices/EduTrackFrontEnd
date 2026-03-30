@@ -46,6 +46,11 @@
         }
 
         <div class="d-flex justify-content-end">
+          <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary px-4 fw-bold" (click)="goBack()">
+            CANCEL
+          </button>
+          
           <button
             type="submit"
             class="btn btn-success px-5 fw-bold"
@@ -54,97 +59,86 @@
             {{ isEditMode ? 'UPDATE ASSESSMENT' : 'SAVE ASSESSMENT' }}
           </button>
         </div>
+        </div>
       </div>
     </div>
   </form>
 
   <form [formGroup]="questionForm">
-    <div class="card shadow-sm mx-auto mb-4" style="max-width: 750px">
-      <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Add Question</h5>
+   <div class="card shadow-sm mx-auto mb-4" style="max-width: 750px">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">{{ isBulkMode ? 'Bulk JSON Import' : 'Add Question' }}</h5>
+    <button class="btn btn-sm btn-light fw-bold" (click)="toggleBulkMode()">
+      {{ isBulkMode ? 'Switch to Manual' : 'Switch to Bulk (JSON)' }}
+    </button>
+  </div>
+
+  <div class="card-body">
+    @if (isBulkMode) {
+      <div class="mb-3">
+        <label class="form-label fw-bold small text-uppercase text-primary">Paste Questions Array (JSON)</label>
+        <textarea
+          class="form-control font-monospace"
+          rows="10"
+          [formControl]="bulkJsonInput"
+          placeholder='[
+  {
+    "question": "What is Java?",
+    "option1": "Language",
+    "option2": "Coffee",
+    "option3": "Island",
+    "option4": "All",
+    "answer": "All"
+  }
+]'
+        ></textarea>
+        <div class="form-text mt-2">
+          <i class="bi bi-info-circle me-1"></i>
+          The <code>courseId</code> will be automatically attached to all questions.
+        </div>
       </div>
-      <div class="card-body">
+
+      <button
+        type="button"
+        class="btn btn-primary w-100 fw-bold"
+        (click)="submitBulkQuestions()"
+      >
+        <i class="bi bi-cloud-upload me-2"></i> UPLOAD BULK QUESTIONS
+      </button>
+    } 
+    
+    @else {
+      <form [formGroup]="questionForm">
         <div class="mb-3">
-          <label class="form-label fw-bold small text-uppercase">Question</label>
-          <textarea
-            class="form-control"
-            rows="2"
-            formControlName="question"
-            placeholder="Enter question text..."
-          ></textarea>
+            <label class="form-label fw-bold small text-uppercase">Question</label>
+            <textarea class="form-control" rows="2" formControlName="question" placeholder="Enter question text..."></textarea>
         </div>
 
         <div class="row g-2">
-          <div class="col-6">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Option 1"
-              formControlName="option1"
-            />
-          </div>
-          <div class="col-6">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Option 2"
-              formControlName="option2"
-            />
-          </div>
-          <div class="col-6">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Option 3 (Optional)"
-              formControlName="option3"
-            />
-          </div>
-          <div class="col-6">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Option 4 (Optional)"
-              formControlName="option4"
-            />
-          </div>
+            <div class="col-6"><input type="text" class="form-control" placeholder="Option 1" formControlName="option1" /></div>
+            <div class="col-6"><input type="text" class="form-control" placeholder="Option 2" formControlName="option2" /></div>
+            <div class="col-6"><input type="text" class="form-control" placeholder="Option 3 (Optional)" formControlName="option3" /></div>
+            <div class="col-6"><input type="text" class="form-control" placeholder="Option 4 (Optional)" formControlName="option4" /></div>
         </div>
 
         <div class="mt-3">
-          <label class="form-label fw-bold small text-uppercase">Correct Answer</label>
-          <select class="form-select" formControlName="answer">
-            <option value="">-- Choose Correct Option --</option>
-            @if (questionForm.get('option1')?.value) {
-              <option [value]="questionForm.get('option1')?.value">
-                {{ questionForm.get('option1')?.value }}
-              </option>
-            }
-            @if (questionForm.get('option2')?.value) {
-              <option [value]="questionForm.get('option2')?.value">
-                {{ questionForm.get('option2')?.value }}
-              </option>
-            }
-            @if (questionForm.get('option3')?.value) {
-              <option [value]="questionForm.get('option3')?.value">
-                {{ questionForm.get('option3')?.value }}
-              </option>
-            }
-            @if (questionForm.get('option4')?.value) {
-              <option [value]="questionForm.get('option4')?.value">
-                {{ questionForm.get('option4')?.value }}
-              </option>
-            }
-          </select>
+            <label class="form-label fw-bold small text-uppercase">Correct Answer</label>
+            <select class="form-select" formControlName="answer">
+                <option value="">-- Choose Correct Option --</option>
+                @if (questionForm.get('option1')?.value) { <option [value]="questionForm.get('option1')?.value">{{questionForm.get('option1')?.value}}</option> }
+                @if (questionForm.get('option2')?.value) { <option [value]="questionForm.get('option2')?.value">{{questionForm.get('option2')?.value}}</option> }
+                @if (questionForm.get('option3')?.value) { <option [value]="questionForm.get('option3')?.value">{{questionForm.get('option3')?.value}}</option> }
+                @if (questionForm.get('option4')?.value) { <option [value]="questionForm.get('option4')?.value">{{questionForm.get('option4')?.value}}</option> }
+            </select>
         </div>
 
-        <button
-          type="button"
-          class="btn btn-outline-primary w-100 mt-3 fw-bold"
-          (click)="addQuestionToBank()"
-        >
-          ADD Question
+        <button type="button" class="btn btn-outline-primary w-100 mt-3 fw-bold" (click)="addQuestionToBank()">
+          ADD SINGLE QUESTION
         </button>
-      </div>
-    </div>
+      </form>
+    }
+  </div>
+</div>
   </form>
 
   <div class="card shadow-sm mx-auto" style="max-width: 750px">

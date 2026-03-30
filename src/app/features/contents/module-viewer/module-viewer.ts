@@ -47,49 +47,43 @@ export class ModuleViewerComponent implements OnInit {
      this.loadContents();
   }
 
-  checkModuleStatus() {
-    const userId = this.authService.getUserId();
-    this.courseService.moduleStatus(userId, this.courseId, this.moduleId).subscribe({
-      next: (res) => {
-        // Since your backend returns 200 for both, we rely on the 'success' field
-        this.isModuleCompleted.set(res.success);
-      },
-      error: (err) => console.error('Error fetching module status', err)
-    });
-  }
+checkModuleStatus() {
+  const userId = this.authService.getUserId();
+  this.courseService.moduleStatus(userId, this.courseId, this.moduleId).subscribe({
+    next: (res) => {
+      // Set to true only if the backend explicitly confirms completion
+      this.isModuleCompleted.set(res.success === true);
+    },
+    error: (err) => {
+      // If error (like 404 not found), it just means not completed yet
+      this.isModuleCompleted.set(false);
+    }
+  });
+}
 
 // Inside loadContents() method in module-viewer.component.ts
+
+// module-viewer.component.ts
 
 loadContents() {
   this.loading.set(true);
   this.contentService.getContentByModule(this.moduleId).subscribe({
     next: (res) => {
-      if (res.success) {
+      // If the backend returns data, the student has access. 
+      // Do not perform an additional "is status active" check here.
+      if (res.success && res.data) {
         let rawData: Content[] = res.data;
-
-        // DRAFT FILTER LOGIC:
-        // If not an admin/instructor, show only Published items
         if (!this.isEditor()) {
           rawData = rawData.filter(item => item.status === 'Published');
         }
-
         this.contents.set(rawData);
-
-        if (rawData.length > 0) {
-          this.selectContent(rawData[0]);
-        } else {
-          this.activeContent.set(null);
-        }
+        if (rawData.length > 0) this.activeContent.set(rawData[0]);
       }
       this.loading.set(false);
     },
-    error: (err) => {
-      console.error(err);
-      this.loading.set(false);
-    }
+    error: () => this.loading.set(false)
   });
 }
-
   selectContent(content: Content) {
     this.activeContent.set(content);
   }
@@ -102,7 +96,7 @@ loadContents() {
           this.isModuleCompleted.set(true);
           toast.success('Module Completed!', {
                         description: 'Successfully marked module as completed.',
-                        duration: 3500
+                        duration: 2200
                       });
         }
       },
@@ -132,8 +126,31 @@ loadContents() {
 }
 
 
-  onDelete(id: number) {
-    if (confirm('Delete this content?')) {
+  async confirmAction(message: string, description: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    toast.warning(message, {
+      description: description,
+      action: {
+        label: 'Confirm',
+        onClick: () => resolve(true),
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => resolve(false),
+      },
+      onDismiss: () => resolve(false), // If the toast expires or is swiped away
+    });
+  });
+}
+
+  async onDelete(id: number) {
+
+        const confirmed = await this.confirmAction(
+    'Delete Module?', 
+    `Module with id: ${id} will be permanently removed.`
+  );
+
+    if (confirmed) {
       this.contentService.deleteContent(id).subscribe(() => {
         this.loadContents();
       });

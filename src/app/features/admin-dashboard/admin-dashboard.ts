@@ -105,8 +105,15 @@ export class AdminDashboardComponent implements OnInit {
     return user ? user.userName : 'Unknown User';
   }
 
-  approveInstructor(email: string) {
-    if (confirm(`Approve instructor ${email}?`)) {
+  async approveInstructor(email: string) {
+
+       const confirmed = await this.confirmAction(
+    'Approve Instructor?', 
+    `${email} will be approved.`
+  );
+
+
+    if (confirmed) {
       this.authService.approveInstructor(email).subscribe({
         next: () => {
           toast.success('Instructor APPROVED');
@@ -116,8 +123,15 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  rejectInstructor(email: string) {
-    if (confirm(`Reject instructor ${email}? This will set status to REJECTED.`)) {
+  async rejectInstructor(email: string) {
+
+
+      const confirmed = await this.confirmAction(
+    'Reject Instructor?', 
+    `${email} will be marked as rejected.`
+  );
+
+    if (confirmed) {
       this.authService.rejectInstructor(email).subscribe({
         next: () => {
           toast.warning('Instructor REJECTED');
@@ -127,8 +141,33 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  deleteUser(userId: number) {
-    if (confirm('Are you sure you want to PERMANENTLY delete this user? This action cannot be undone.')) {
+  async confirmAction(message: string, description: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    toast.warning(message, {
+      description: description,
+      action: {
+        label: 'Confirm',
+        onClick: () => resolve(true),
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => resolve(false),
+      },
+      onDismiss: () => resolve(false), // If the toast expires or is swiped away
+    });
+  });
+}
+
+
+  async deleteUser(userId: number) {
+
+    const confirmed = await this.confirmAction(
+    'Delete User?', 
+    `User with id: ${userId} will permanently removed.`
+  );
+
+
+if (confirmed) {
       this.authService.deleteUser(userId).subscribe({
         next: () => {
           toast.success('User deleted successfully');

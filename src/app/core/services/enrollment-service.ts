@@ -14,13 +14,20 @@ export class EnrollmentService {
   }
 
   // Check if student is already in a program
-  checkEnrollmentExists(userId: number, programId: number, status: string = 'Active') {
+  checkEnrollmentExists(userId: number, programId: number) {
     const params = new HttpParams()
       .set('userId', userId)
       .set('programId', programId)
-      .set('status', status);
     return this.http.get<boolean>(`${this.baseUrl}/exists`, { params });
   }
+
+  //   anyEnrollmentExists(userId: number, programId: number) {
+  //   const params = new HttpParams()
+  //     .set('userId', userId)
+  //     .set('programId', programId)
+  
+  //   return this.http.get<boolean>(`${this.baseUrl}/anyEnrollmentExists`, { params });
+  // }
 
   // Get all enrollments for a specific student
   getEnrollmentsByStudent(userId: number) {

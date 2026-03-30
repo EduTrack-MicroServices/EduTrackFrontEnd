@@ -87,7 +87,7 @@ loadMyEnrollments() {
       this.programService.getProgramProgress(enroll.programId, userId).subscribe({
         next: (res) => {
           if (res.success) {
-            console.log(`Progress for Programmm ID ${enroll.programId}:`, res.data);
+            
             // Update the map
             this.programProgress.update(prev => ({
               ...prev,
@@ -95,9 +95,10 @@ loadMyEnrollments() {
             }));
            
             // LOGIC FIX: If backend says program is 100% but enrollment is still 'Active'
-            
+          
             if (res.data.programCompleted && enroll.status !== 'Completed') {
-              this.syncEnrollmentStatus(enroll.programId);
+             
+              this.syncEnrollmentStatus(enroll.enrollmentId);
             }
           }
         }
