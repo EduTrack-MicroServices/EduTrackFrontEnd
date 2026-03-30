@@ -58,56 +58,59 @@
               }
             </div>
             } @else {
-      <div class="student-action-box">
-        @if (canTakeAssessment()) {
-          @if (hasAssessment) {
-            @if (!submission()) {
-               <div class="text-center mb-3">
-                 <h6 class="fw-bold text-dark mb-1">Final Step</h6>
-                 <p class="text-muted small">Pass the quiz to earn your credits.</p>
-               </div>
-               <button class="btn btn-success w-100 py-3 rounded-3 shadow fw-bold pulse-green"
-                 [routerLink]="['/courses', courseId, 'assessment']">
-                 Take Assessment <i class="bi bi-arrow-right ms-2"></i>
-               </button>
-            }@else if (submission().score < 4) { <div class="text-center mb-3">
-                <h6 class="fw-bold text-dark mb-1">Give another try</h6>
-                <p class="text-muted small">Pass the quiz to earn your credits.</p>
-            </div>
-            <button class="btn btn-warning w-100 py-3 rounded-3 shadow fw-bold text-dark hvr-lift"
-              [routerLink]="['/courses', courseId, 'assessment']">
-              Retry Assessment <i class="bi bi-arrow-clockwise ms-2"></i>
-            </button>
-            } @else {
-            <div class="text-center mb-3">
-              <h6 class="fw-bold text-dark mb-1">Good work!</h6>
-              <p class="text-muted small">You've passed the quiz.</p>
-            </div>
-            <button class="btn btn-info w-100 py-3 rounded-3 shadow fw-bold text-white hvr-lift"
-              [routerLink]="['/courses', courseId, 'assessment']">
-              View Results <i class="bi bi-award ms-2"></i>
-            </button>
-            }
-            }@else {
-            <div class="text-center">
-              <div class="lock-icon mb-2 text-success"><i class="bi bi-check-circle-fill"></i></div>
-              <p class="fw-bold text-dark mb-0">Modules Complete!</p>
-              <small class="text-muted">Waiting for instructor to open assessment.</small>
-            </div>
-          }
-        } @else {
-          <div class="locked-progress text-center animate__animated animate__fadeIn">
-            <div class="lock-icon mb-2"><i class="bi bi-lock-fill text-muted"></i></div>
-            <p class="fw-bold text-dark mb-2">Assessment Locked</p>
-            <div class="progress rounded-pill mb-2" style="height: 8px; background-color: #e9ecef;">
-              <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
-                [style.width.%]="(modules().length > 0) ? (completedCount() / modules().length) * 100 : 0">
-              </div>
-            </div>
-            <small class="text-muted">{{completedCount()}}/{{modules().length}} modules finished</small>
+     <div class="student-action-box">
+  @if (submission() && submission().score >= 4) {
+      <div class="text-center mb-3">
+        <h6 class="fw-bold text-success mb-1">Course Mastered!</h6>
+        <p class="text-muted small">You have successfully passed this course.</p>
+      </div>
+      <button class="btn btn-info w-100 py-3 rounded-3 shadow fw-bold text-white hvr-lift"
+        [routerLink]="['/courses', courseId, 'assessment']">
+        View Results <i class="bi bi-award ms-2"></i>
+      </button>
+  } 
+  @else if (canTakeAssessment()) {
+    @if (hasAssessment) {
+      @if (!submission()) {
+          <div class="text-center mb-3">
+            <h6 class="fw-bold text-dark mb-1">Final Step</h6>
+            <p class="text-muted small">Pass the quiz to earn your credits.</p>
           </div>
-            }
+          <button class="btn btn-success w-100 py-3 rounded-3 shadow fw-bold pulse-green"
+            [routerLink]="['/courses', courseId, 'assessment']">
+            Take Assessment <i class="bi bi-arrow-right ms-2"></i>
+          </button>
+      } @else if (submission().score < 4) { 
+          <div class="text-center mb-3">
+            <h6 class="fw-bold text-dark mb-1">Give another try</h6>
+            <p class="text-muted small">Pass the quiz to earn your credits.</p>
           </div>
+          <button class="btn btn-warning w-100 py-3 rounded-3 shadow fw-bold text-dark hvr-lift"
+            [routerLink]="['/courses', courseId, 'assessment']">
+            Retry Assessment <i class="bi bi-arrow-clockwise ms-2"></i>
+          </button>
+      }
+    } @else {
+      <div class="text-center">
+        <div class="lock-icon mb-2 text-success"><i class="bi bi-check-circle-fill"></i></div>
+        <p class="fw-bold text-dark mb-0">Modules Complete!</p>
+        <small class="text-muted">Waiting for instructor to open assessment.</small>
+      </div>
+    }
+  } 
+  @else {
+    <div class="locked-progress text-center animate__animated animate__fadeIn">
+      <div class="lock-icon mb-2"><i class="bi bi-lock-fill text-muted"></i></div>
+      <p class="fw-bold text-dark mb-2">Assessment Locked</p>
+      <div class="progress rounded-pill mb-2" style="height: 8px; background-color: #e9ecef;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+          [style.width.%]="(modules().length > 0) ? (completedCount() / modules().length) * 100 : 0">
+        </div>
+      </div>
+      <small class="text-muted">{{completedCount()}}/{{modules().length}} modules finished</small>
+    </div>
+  }
+</div>
           }
         </div>
       </div>
@@ -136,17 +139,17 @@
       </div>
 
       <div class="col-auto d-flex align-items-center gap-2">
-        
-       @if (isEditor() || isEnrolled()) {
-    <button class="btn btn-primary rounded-pill px-4 btn-sm fw-bold hvr-lift"
-      [routerLink]="['/programs', pId, 'courses', courseId, 'modules', module.moduleId, 'viewer']">
-      {{ isEditor() ? 'Manage' : 'Start' }} <i class="bi bi-play-fill ms-1"></i>
-    </button>
-  } @else {
-    <span class="badge bg-light text-muted border px-3 py-2">
-      <i class="bi bi-lock me-1"></i> Locked! Please Enroll
-    </span>
-  }
+
+        @if (isEditor() || isEnrolled()) {
+        <button class="btn btn-primary rounded-pill px-4 btn-sm fw-bold hvr-lift"
+          [routerLink]="['/programs', pId, 'courses', courseId, 'modules', module.moduleId, 'viewer']">
+          {{ isEditor() ? 'Manage' : 'Start' }} <i class="bi bi-play-fill ms-1"></i>
+        </button>
+        } @else {
+        <span class="badge bg-light text-muted border px-3 py-2">
+          <i class="bi bi-lock me-1"></i> Locked! Please Enroll
+        </span>
+        }
         @if (isEditor()) {
         <div class="btn-group shadow-sm">
           <button class="btn btn-white btn-sm border" [routerLink]="['/modules/edit', module.moduleId]">

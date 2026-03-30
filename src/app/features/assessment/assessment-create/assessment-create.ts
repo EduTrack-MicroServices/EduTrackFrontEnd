@@ -17,6 +17,9 @@ export class AssessmentCreateComponent implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
+  bulkJsonInput = new FormControl('');
+  isBulkMode = false; // Toggle for the UI
+
   today = new Date().toISOString().split('T')[0];
   courseId!: number;
   programId!: number;
@@ -174,4 +177,52 @@ export class AssessmentCreateComponent implements OnInit {
     toast.error(this.serverErrorMessage);
     this.cdr.detectChanges();
   }
+
+  goBack(){
+    window.history.back()
+  }
+
+  submitBulkQuestions() {
+    const rawValue = this.bulkJsonInput.value;
+    if (!rawValue || rawValue.trim() === '') {
+      toast.warning('Please paste JSON data first');
+      return;
+    }
+
+    try {
+      // Parse the string into a JSON array
+      const questionsArray = JSON.parse(rawValue);
+
+      if (!Array.isArray(questionsArray)) {
+        toast.error('Data must be an array of questions [{}, {}]');
+        return;
+      }
+
+      // Automatically attach the current courseId to every question in the array
+      const sanitizedQuestions = questionsArray.map(q => ({
+        ...q,
+        courseId: this.courseId
+      }));
+
+      this.api.bulkCreateQuestions(sanitizedQuestions).subscribe({
+        next: (res) => {
+          toast.success(`${sanitizedQuestions.length} questions added successfully!`);
+          this.bulkJsonInput.reset();
+          this.loadQuestions(); // Refresh the list below
+          this.isBulkMode = false; // Switch back to normal view
+        },
+        error: (err) => {
+          this.serverErrorMessage = err.error?.message || 'Bulk upload failed. Check JSON format.';
+          toast.error('Bulk Upload Failed');
+        }
+      });
+    } catch (e) {
+      toast.error('Invalid JSON format. Please check your syntax.');
+    }
+  }
+
+  toggleBulkMode() {
+    this.isBulkMode = !this.isBulkMode;
+  }
+
 }

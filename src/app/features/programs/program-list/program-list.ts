@@ -47,7 +47,7 @@ ngOnInit() {
   onDelete(id: number) {
     // Action Toast replacing the confirm() dialog
     toast.warning('Delete this program?', {
-      description: 'Are you sure? This action cannot be undone and will affect enrolled students.',
+      description: 'Are you sure? This action affect enrolled students.',
       action: {
         label: 'Delete',
         onClick: () => {

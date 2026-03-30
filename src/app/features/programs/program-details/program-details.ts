@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Program, Course } from '../../../core/models/course';
 import { AuthService } from '../../../core/services/auth';
@@ -23,6 +23,7 @@ export class ProgramDetailsComponent implements OnInit {
   public authService = inject(AuthService); // Changed to public to access in HTML
   private enrollmentService = inject(EnrollmentService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   @ViewChild('certGenerator') certGenerator!: CertificateComponent;
 
@@ -79,28 +80,37 @@ export class ProgramDetailsComponent implements OnInit {
     });
   }
 
-  loadProgress() {
+ loadProgress() {
     const userId = this.authService.getUserId();
     if (userId && userId !== 0 && !this.isEditor()) {
       this.courseService.getProgramProgress(this.programId, userId).subscribe({
         next: (res) => {
           if (res.success) {
             this.progress.set(res.data);
+            
+            // CRITICAL FIX: If they completed the program, they are 
+            // definitely enrolled. Set this immediately to hide the enroll button.
+            if (res.data.programCompleted) {
+              this.isEnrolled.set(true);
+            }
           }
         }
       });
     }
   }
 
-  checkStatus() {
-    const userId = this.authService.getUserId();
-    if (userId && userId !== 0) {
-      this.enrollmentService.checkEnrollmentExists(userId, this.programId).subscribe(exists => {
+checkStatus() {
+  const userId = this.authService.getUserId(); 
+  if (userId) {
+    // Calling the updated service (no status sent)
+    this.enrollmentService.checkEnrollmentExists(userId, this.programId).subscribe({
+      next: (exists) => {
         this.isEnrolled.set(exists);
-      });
-    }
+        this.cdr.detectChanges();
+      }
+    });
   }
-
+}
   onEnroll() {
     const userId = this.authService.getUserId();
     if (!userId || userId === 0) {
@@ -146,11 +156,25 @@ export class ProgramDetailsComponent implements OnInit {
         onClick: () => {
           this.courseService.deleteCourse(courseId).subscribe({
             next: () => {
-              toast.success('Course Deleted');
+              // Success Toast replacing the alert()
+              toast.success('Module removed successfully', {
+                duration: 3000
+              });
               this.loadData();
             },
-            error: (err) => toast.error('Delete failed', { description: err.error?.message })
+            error: (err) => {
+              toast.error('Failed to delete module', {
+                description: err.error?.message || 'An error occurred.',
+                duration: 4000
+              });
+            }
           });
+        }
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {
+          // Optional: Do nothing, just close the toast
         }
       }
     });

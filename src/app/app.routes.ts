@@ -21,36 +21,34 @@ import { HomeComponent } from './features/home/home';
 import { Analysispage } from './features/analysispage/analysispage';
 import { Studentprogress } from './features/studentprogress/studentprogress';
 import { Profilepage } from './features/profilepage/profilepage';
+import { guestGuard } from './core/guards/guest-guard';
 
 export const routes: Routes = [
-  {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
-    path: 'home',
-    component: HomeComponent,
-  },
-  {
-    path: 'register',
-    component: RegisterComponent,
-  },
-  {
-    path: 'dashboard',
-    component: DashboardComponent,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'admin-dashboard',
-    component: AdminDashboardComponent,
-    canActivate: [authGuard, roleGuard],
-    data: { roles: ['ADMIN'] },
-  },
-  {
-    path: 'program-list',
-    component: ProgramListComponent,
-    canActivate: [authGuard],
-  },
+
+
+     
+    {
+        path: 'home', component: HomeComponent,canActivate: [guestGuard]
+    },
+    {
+        path: 'register', component: RegisterComponent
+    },
+    {
+        path: 'dashboard', component: DashboardComponent,
+        canActivate: [authGuard],
+
+    },
+    {
+        path: 'admin-dashboard',
+        component: AdminDashboardComponent,
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['ADMIN'] }
+    },
+    {
+        path: 'program-list', component: ProgramListComponent,
+        canActivate: [authGuard],
+
+    },
 
   {
     path: 'programs/new',

@@ -19,7 +19,8 @@
             <span class="badge rounded-pill bg-primary px-3 py-2 text-uppercase letter-spacing-1">
               <i class="bi bi-patch-check-fill me-1"></i> Certified Track
             </span>
-            <span class="badge rounded-pill bg-white bg-opacity-10 px-3 py-2 text-white-50 border border-white border-opacity-10">
+            <span
+              class="badge rounded-pill bg-white bg-opacity-10 px-3 py-2 text-white-50 border border-white border-opacity-10">
               {{ p.status }}
             </span>
           </div>
@@ -47,49 +48,40 @@
           </div>
         </div>
 
-        <div class="col-lg-4 text-lg-end mt-5 mt-lg-0">
-          @if (!isEditor()) {
-            @if (isEnrolled()) {
-              @if (progress()?.programCompleted) {
-                <div class="completed-status-card animate__animated animate__tada border-warning">
-                  <div class="medal-icon mb-2">
-                    <i class="bi bi-trophy-fill text-warning fs-1"></i>
-                  </div>
-                  <h4 class="fw-extrabold mb-1 text-white">Track Completed!</h4>
-                  <p class="small text-white-50 mb-3">You've mastered this curriculum.</p>
-                  <button class="btn btn-outline-warning btn-sm rounded-pill px-4" (click)="downloadCertificate()">
-                    <i class="bi bi-file-earmark-pdf me-2"></i>Download Certificate
-                  </button>
-                </div>
-              } 
-              @else {
-                <div class="enrolled-status-card animate__animated animate__zoomIn">
-                  <i class="bi bi-check-circle-fill text-success fs-2 mb-2"></i>
-                  <h5 class="mb-0 fw-bold text-white">Active Enrollment</h5>
-                  <p class="small text-white-50 mb-2">Progress: {{ progress()?.completionPercentage || 0 }}%</p>
-                  <div class="progress bg-white bg-opacity-10" style="height: 6px; border-radius: 10px;">
-                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
-                         [style.width.%]="progress()?.completionPercentage || 0"></div>
-                  </div>
-                </div>
-              }
-            } @else {
-              <div class="d-flex flex-column align-items-lg-end">
-                <button class="btn btn-warning btn-lg fw-bold px-5 py-3 shadow-lg transition-all" 
-                        [disabled]="!canEnroll()"
-                        (click)="onEnroll()"
-                        [class.opacity-50]="!canEnroll()"
-                        [class.hover-scale-up]="canEnroll()">
-                  {{ courses().length > 0 ? 'Enroll in Program' : 'Enrollment Unavailable' }}
-                  <i class="bi bi-arrow-right-short ms-2"></i>
-                </button>
-                @if (courses().length === 0) {
-                  <small class="text-warning mt-2 animate__animated animate__fadeIn">
-                    <i class="bi bi-exclamation-triangle me-1"></i> Curriculum pending upload.
-                  </small>
-                }
-              </div>
-            }
+     <div class="col-lg-4 text-lg-end mt-5 mt-lg-0">
+  @if (!isEditor()) {
+    @if (progress()?.programCompleted) {
+      <div class="completed-status-card animate__animated animate__tada border-warning p-4 rounded-4 bg-white bg-opacity-10 shadow-lg text-center">
+        <div class="medal-icon mb-2">
+          <i class="bi bi-trophy-fill text-warning fs-1"></i>
+        </div>
+        <h4 class="fw-extrabold mb-1 text-white">Track Completed!</h4>
+        <p class="small text-white-50 mb-3">You've mastered this curriculum.</p>
+        <button class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-sm" (click)="downloadCertificate()">
+          <i class="bi bi-file-earmark-pdf-fill me-2"></i>Download Certificate
+        </button>
+      </div>
+    } 
+    @else if (isEnrolled()) {
+      <div class="enrolled-status-card animate__animated animate__zoomIn">
+        <i class="bi bi-check-circle-fill text-success fs-2 mb-2"></i>
+        <h5 class="mb-0 fw-bold text-white">Active Enrollment</h5>
+        <p class="small text-white-50 mb-2">Progress: {{ progress()?.completionPercentage || 0 }}%</p>
+        <div class="progress bg-white bg-opacity-10" style="height: 6px; border-radius: 10px;">
+          <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
+               [style.width.%]="progress()?.completionPercentage || 0"></div>
+        </div>
+      </div>
+    }
+          @else {
+          <div class="d-flex flex-column align-items-lg-end">
+            <button class="btn btn-warning btn-lg fw-bold px-5 py-3 shadow-lg transition-all" [disabled]="!canEnroll()"
+              (click)="onEnroll()" [class.opacity-50]="!canEnroll()" [class.hover-scale-up]="canEnroll()">
+              {{ courses().length > 0 ? 'Enroll in Program' : 'Enrollment Unavailable' }}
+              <i class="bi bi-arrow-right-short ms-2"></i>
+            </button>
+          </div>
+          }
           }
         </div>
       </div>
@@ -102,82 +94,85 @@
       <p class="text-muted small">Sequential courses designed for career mastery</p>
     </div>
     @if (isEditor()) {
-      <button class="btn btn-outline-success rounded-pill px-4 fw-bold transition-all hvr-lift" [routerLink]="['/programs', programId, 'add-course']">
-        <i class="bi bi-plus-circle-dotted me-2"></i>New Course
-      </button>
+    <button class="btn btn-outline-success rounded-pill px-4 fw-bold transition-all hvr-lift"
+      [routerLink]="['/programs', programId, 'add-course']">
+      <i class="bi bi-plus-circle-dotted me-2"></i>New Course
+    </button>
     }
   </div>
 
   @if (isLoading()) {
-    <div class="row g-3">
-      @for (i of [1,2,3]; track i) {
-        <div class="col-12 mb-3">
-          <div class="skeleton-card"></div>
-        </div>
-      }
+  <div class="row g-3">
+    @for (i of [1,2,3]; track i) {
+    <div class="col-12 mb-3">
+      <div class="skeleton-card"></div>
     </div>
+    }
+  </div>
   } @else {
-    <div class="row g-3">
-      @for (course of courses(); track course.courseId) {
-        <div class="col-12">
-          <div class="card border-0 shadow-sm course-row-card h-100 transition-all">
-            <div class="card-body p-4">
-              <div class="row align-items-center">
-                <div class="col-auto">
-                  <div class="course-index-circle">{{ $index + 1 }}</div>
-                </div>
-                <div class="col">
-                  <div class="d-flex align-items-center gap-3">
-                    <h5 class="mb-1 fw-bold text-dark">{{ course.name }}</h5>
-                    <span class="badge" [ngClass]="course.status === 'ACTIVE' ? 'bg-success-subtle text-success border-success' : 'bg-dark text-white-50'">
-                      {{ course.status }}
-                    </span>
-                  </div>
-                  <div class="d-flex align-items-center gap-4 mt-1">
-                    <span class="text-muted small"><i class="bi bi-star-fill text-warning me-1"></i> {{ course.creditPoints }} Credits</span>
-                    <span class="text-muted small"><i class="bi bi-layers me-1"></i> Professional Module</span>
-                  </div>
-                </div> 
-                <div class="col-md-auto mt-3 mt-md-0 d-flex gap-2">
-                  <button class="btn btn-light border rounded-pill px-4 fw-medium text-primary hover-bg-primary" 
-                          [routerLink]="['/programs', programId, 'courses', course.courseId]" [disabled]="course.status === 'INACTIVE'">
-                    Explore <i class="bi bi-chevron-right ms-1"></i>
-                  </button>
-                  
-                  @if (isEditor()) {
-                        <button class="btn btn-light" [routerLink]="['/courses/edit', course.courseId]">
-                            <i class="bi bi-pencil text-warning"></i>
-                        </button>
-                        <button class="btn btn-light" (click)="onDeleteCourse(course.courseId!)">
-                            <i class="bi bi-trash text-danger"></i>
-                        </button>
-                        }
-                </div>
+  <div class="row g-3">
+    @for (course of courses(); track course.courseId) {
+    <div class="col-12">
+      <div class="card border-0 shadow-sm course-row-card h-100 transition-all">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <div class="course-index-circle">{{ $index + 1 }}</div>
+            </div>
+            <div class="col">
+              <div class="d-flex align-items-center gap-3">
+                <h5 class="mb-1 fw-bold text-dark">{{ course.name }}</h5>
+                <span class="badge"
+                  [ngClass]="course.status === 'ACTIVE' ? 'bg-success-subtle text-success border-success' : 'bg-dark text-white-50'">
+                  {{ course.status }}
+                </span>
               </div>
+              <div class="d-flex align-items-center gap-4 mt-1">
+                <span class="text-muted small"><i class="bi bi-star-fill text-warning me-1"></i> {{ course.creditPoints
+                  }} Credits</span>
+                <span class="text-muted small"><i class="bi bi-layers me-1"></i> Professional Module</span>
+              </div>
+            </div>
+            <div class="col-md-auto mt-3 mt-md-0 d-flex gap-2">
+              <button class="btn btn-light border rounded-pill px-4 fw-medium text-primary hover-bg-primary"
+                [routerLink]="['/programs', programId, 'courses', course.courseId]"
+                [disabled]="course.status === 'INACTIVE'">
+                Explore <i class="bi bi-chevron-right ms-1"></i>
+              </button>
+
+              @if (isEditor()) {
+              <button class="btn btn-light" [routerLink]="['/courses/edit', course.courseId]">
+                <i class="bi bi-pencil text-warning"></i>
+              </button>
+              <button class="btn btn-light" (click)="onDeleteCourse(course.courseId!)">
+                <i class="bi bi-trash text-danger"></i>
+              </button>
+              }
             </div>
           </div>
         </div>
-      } @empty {
-        <div class="empty-curriculum-box text-center py-5 rounded-4 bg-white border shadow-sm">
-          <div class="mb-3">
-            <i class="bi bi-cloud-slash display-3 text-light-emphasis"></i>
-          </div>
-          <h5 class="fw-bold text-dark">Curriculum Draft in Progress</h5>
-          <p class="text-muted px-5">We are currently curating the professional modules for <strong>{{p.name}}</strong>. Courses will be uploaded shortly!</p>
-          @if (isEditor()) {
-            <button class="btn btn-primary rounded-pill px-4 mt-2" [routerLink]="['/programs', programId, 'add-course']">
-              Add First Course
-            </button>
-          }
-        </div>
+      </div>
+    </div>
+    } @empty {
+    <div class="empty-curriculum-box text-center py-5 rounded-4 bg-white border shadow-sm">
+      <div class="mb-3">
+        <i class="bi bi-cloud-slash display-3 text-light-emphasis"></i>
+      </div>
+      <h5 class="fw-bold text-dark">Curriculum Draft in Progress</h5>
+      <p class="text-muted px-5">We are currently curating the professional modules for <strong>{{p.name}}</strong>.
+        Courses will be uploaded shortly!</p>
+      @if (isEditor()) {
+      <button class="btn btn-primary rounded-pill px-4 mt-2" [routerLink]="['/programs', programId, 'add-course']">
+        Add First Course
+      </button>
       }
     </div>
+    }
+  </div>
   }
 </div>
 
 
-<app-certificate #certGenerator
-    [studentName]="authService.getUserName()" 
-    [programName]="selectedProgramName"
-    [completionDate]="today">
+<app-certificate #certGenerator [studentName]="authService.getUserName()" [programName]="selectedProgramName"
+  [completionDate]="today">
 </app-certificate>
