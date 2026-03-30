@@ -67,6 +67,11 @@ export class CourseDetailsComponent implements OnInit {
         if (res.success) {
           this.canTakeAssessment.set(res.data.canTakeAssessment);
           this.completedCount.set(res.data.completedModules);
+          
+          // FIX: If they have finished all modules, they are definitely enrolled/completed
+          if (res.data.canTakeAssessment) {
+            this.isEnrolled.set(true);
+          }
           this.cdr.detectChanges();
         }
       }
@@ -94,12 +99,15 @@ export class CourseDetailsComponent implements OnInit {
     });
   }
  
-  checkUserSubmission(assessmentId: number) {
+checkUserSubmission(assessmentId: number) {
     const userId = this.authService.getUserId();
     this.assessmentService.checkSubmission(userId, assessmentId).subscribe({
       next: (res: any) => {
         if (res.success && res.data) {
           this.submission.set(res.data);
+          
+          // FIX: If they have a submission (pass or fail), they must have access
+          this.isEnrolled.set(true); 
           this.cdr.detectChanges();
         }
       }

@@ -23,7 +23,7 @@
           </div>
         </div>
         
-        <h2 class="user-name">{{ profile.userName }}</h2>
+        <h2 class="user-name">{{ profile.userName | titlecase }}</h2>
         <span class="role-badge" [ngClass]="profile.role?.toLowerCase()">
           {{ profile.role }}
         </span>

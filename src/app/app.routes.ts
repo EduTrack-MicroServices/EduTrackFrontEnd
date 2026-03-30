@@ -21,13 +21,14 @@ import { HomeComponent } from './features/home/home';
 import { Analysispage } from './features/analysispage/analysispage';
 import { Studentprogress } from './features/studentprogress/studentprogress';
 import { Profilepage } from './features/profilepage/profilepage';
+import { guestGuard } from './core/guards/guest-guard';
 
 export const routes: Routes = [
+
+
+     
     {
-        path: 'login', component: LoginComponent
-    },
-    {
-        path: 'home', component: HomeComponent
+        path: 'home', component: HomeComponent,canActivate: [guestGuard]
     },
     {
         path: 'register', component: RegisterComponent
