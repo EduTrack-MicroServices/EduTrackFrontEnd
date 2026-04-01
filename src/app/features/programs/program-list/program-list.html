@@ -44,8 +44,8 @@
             <div class="card-footer bg-primary-soft border-0 p-3 d-flex gap-2">
               <button class="btn btn-dark flex-grow-1 rounded-3 py-2 fw-bold shadow-sm" 
                       [routerLink]="['/programs', program.programId]" 
-                      [disabled]="program.status === 'INACTIVE'">
-                {{ program.status === 'INACTIVE' ? 'Unavailable' : 'Explore Program' }}
+                      [disabled]="program.status === 'INACTIVE' && !isEditor()">
+                {{ program.status === 'INACTIVE' && !isEditor() ? 'Unavailable' : 'Explore Program' }}
               </button>
 
               @if (isEditor()) {
