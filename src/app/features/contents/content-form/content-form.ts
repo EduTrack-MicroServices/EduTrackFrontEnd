@@ -49,7 +49,7 @@ export class ContentFormComponent implements OnInit {
           console.log(res.data)
           this.contentForm.patchValue(res.data);
         }
-        else{
+        else {
           console.log(res)
         }
       },
@@ -72,8 +72,8 @@ export class ContentFormComponent implements OnInit {
               toast.success('Content updated successfully');
               window.history.back();
             }
-            else{
-              console.log("update failed" +res)
+            else {
+              console.log("update failed" + res)
             }
           },
           error: (err) => toast.error(err.error?.message || 'Update failed')
