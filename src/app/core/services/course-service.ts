@@ -21,7 +21,7 @@ export class CourseService {
   createProgram(program: Program) {
     return this.http.post<ApiResponse<Program>>(`${this.baseUrl}/programs`, program);
   }
-  
+
 
   updateProgram(id: number, program: Program) {
     return this.http.put<ApiResponse<Program>>(`${this.baseUrl}/programs/${id}`, program);
@@ -30,19 +30,19 @@ export class CourseService {
   deleteProgram(id: number) {
     return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/programs/${id}`);
   }
- 
-  
+
+
 
 
   // Courses
 
   addCourse(programId: number, course: Course) {
-  return this.http.post<ApiResponse<Course>>(`${this.baseUrl}/programs/${programId}/courses`, course);
-}
+    return this.http.post<ApiResponse<Course>>(`${this.baseUrl}/programs/${programId}/courses`, course);
+  }
 
-updateCourse(courseId: number, course: Course) {
-  return this.http.put<ApiResponse<Course>>(`${this.baseUrl}/courses/${courseId}`, course);
-}
+  updateCourse(courseId: number, course: Course) {
+    return this.http.put<ApiResponse<Course>>(`${this.baseUrl}/courses/${courseId}`, course);
+  }
   deleteCourse(courseId: number) {
     return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/courses/${courseId}`);
   }
@@ -65,27 +65,29 @@ updateCourse(courseId: number, course: Course) {
     return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/modules/${moduleId}`);
   }
   getModuleById(moduleId: number) {
-  return this.http.get<ApiResponse<Module>>(`${this.baseUrl}/modules/${moduleId}`);
-}
-addModule(courseId: number, module: Module) {
-  return this.http.post<ApiResponse<Module>>(`${this.baseUrl}/courses/${courseId}/modules`, module);}
+    return this.http.get<ApiResponse<Module>>(`${this.baseUrl}/modules/${moduleId}`);
+  }
+  addModule(courseId: number, module: Module) {
+    return this.http.post<ApiResponse<Module>>(`${this.baseUrl}/courses/${courseId}/modules`, module);
+  }
 
-updateModule(moduleId: number, module: Module) {
-  return this.http.put<ApiResponse<Module>>(`${this.baseUrl}/modules/${moduleId}`, module);}
+  updateModule(moduleId: number, module: Module) {
+    return this.http.put<ApiResponse<Module>>(`${this.baseUrl}/modules/${moduleId}`, module);
+  }
 
 
   // ================= PROGRESS API =================
 
-moduleStatus(userId: number, courseId: number, moduleId: number) {
-  return this.http.get<ApiResponse<any>>(
-    `${this.baseUrl}/progress/module-status/course/${courseId}/module/${moduleId}/user/${userId}`
-  )
-   
-}
+  moduleStatus(userId: number, courseId: number, moduleId: number) {
+    return this.http.get<ApiResponse<any>>(
+      `${this.baseUrl}/progress/module-status/course/${courseId}/module/${moduleId}/user/${userId}`
+    )
+
+  }
 
 
 
-markModuleComplete(userId: number, courseId: number, moduleId: number) {
+  markModuleComplete(userId: number, courseId: number, moduleId: number) {
     const params = new HttpParams()
       .set('userId', userId)
       .set('courseId', courseId)

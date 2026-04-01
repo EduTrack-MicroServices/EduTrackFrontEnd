@@ -5,43 +5,39 @@
     </div>
     <div class="card-body p-4">
       <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
-        
+
         <div class="mb-3">
           <label class="form-label fw-bold">Course Title</label>
-          <input formControlName="name" 
-                 class="form-control" 
-                 [class.is-invalid]="courseForm.get('name')?.invalid && courseForm.get('name')?.touched"
-                 placeholder="e.g. Advanced Microservices">
+          <input formControlName="name" class="form-control"
+            [class.is-invalid]="courseForm.get('name')?.invalid && courseForm.get('name')?.touched"
+            placeholder="e.g. Advanced Microservices">
           @if (courseForm.get('name')?.invalid && courseForm.get('name')?.touched) {
-            <div class="invalid-feedback">Course title is required.</div>
+          <div class="invalid-feedback">Course title is required.</div>
           }
         </div>
 
         <div class="mb-3">
           <label class="form-label fw-bold">Description</label>
           <textarea formControlName="description" class="form-control" rows="4"></textarea>
-          </div>
+        </div>
 
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label fw-bold">Credit Points</label>
-            <input type="number" 
-                   formControlName="creditPoints" 
-                   class="form-control"
-                   [class.is-invalid]="courseForm.get('creditPoints')?.invalid && courseForm.get('creditPoints')?.touched">
+            <input type="number" formControlName="creditPoints" class="form-control"
+              [class.is-invalid]="courseForm.get('creditPoints')?.invalid && courseForm.get('creditPoints')?.touched">
             @if (courseForm.get('creditPoints')?.invalid && courseForm.get('creditPoints')?.touched) {
-              <div class="invalid-feedback">
-                @if (courseForm.get('creditPoints')?.errors?.['required']) { <span>Required.</span> }
-                @if (courseForm.get('creditPoints')?.errors?.['min']) { <span>Must be 0 or more.</span> }
-              </div>
+            <div class="invalid-feedback">
+              @if (courseForm.get('creditPoints')?.errors?.['required']) { <span>Required.</span> }
+              @if (courseForm.get('creditPoints')?.errors?.['min']) { <span>Must be 0 or more.</span> }
+            </div>
             }
           </div>
 
           <div class="col-md-6 mb-3">
             <label class="form-label fw-bold">Status</label>
-            <select formControlName="status" 
-                    class="form-select"
-                    [class.is-invalid]="courseForm.get('status')?.invalid && courseForm.get('status')?.touched">
+            <select formControlName="status" class="form-select"
+              [class.is-invalid]="courseForm.get('status')?.invalid && courseForm.get('status')?.touched">
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
             </select>

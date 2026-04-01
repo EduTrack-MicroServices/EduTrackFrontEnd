@@ -6,7 +6,7 @@ import { CourseService } from '../../../core/services/course-service';
 import { CommonModule } from '@angular/common';
 import { EnrollmentService } from '../../../core/services/enrollment-service';
 import { EnrollmentRequest } from '../../../core/models/enrollment';
-import { toast } from 'ngx-sonner'; 
+import { toast } from 'ngx-sonner';
 import { ProgramProgressResponse } from '../../../core/models/progress';
 import { CertificateComponent } from '../../certificate/certificate';
 
@@ -50,7 +50,7 @@ export class ProgramDetailsComponent implements OnInit {
   ngOnInit() {
     this.programId = Number(this.route.snapshot.paramMap.get('id'));
 
-    
+
     this.authService.fetchUserDetails();
 
     console.log('User name:', this.authService.getUserName()); // sample line
@@ -81,7 +81,7 @@ export class ProgramDetailsComponent implements OnInit {
     });
   }
 
- loadProgress() {
+  loadProgress() {
     const userId = this.authService.getUserId();
     if (userId && userId !== 0 && !this.isEditor()) {
       this.courseService.getProgramProgress(this.programId, userId).subscribe({
@@ -110,18 +110,18 @@ export class ProgramDetailsComponent implements OnInit {
     }
   }
 
-checkStatus() {
-  const userId = this.authService.getUserId(); 
-  if (userId) {
-    // Calling the updated service (no status sent)
-    this.enrollmentService.checkEnrollmentExists(userId, this.programId).subscribe({
-      next: (exists) => {
-        this.isEnrolled.set(exists);
-        this.cdr.detectChanges();
-      }
-    });
+  checkStatus() {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      // Calling the updated service (no status sent)
+      this.enrollmentService.checkEnrollmentExists(userId, this.programId).subscribe({
+        next: (exists) => {
+          this.isEnrolled.set(exists);
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
-}
   onEnroll() {
     const userId = this.authService.getUserId();
     if (!userId || userId === 0) {
@@ -143,7 +143,7 @@ checkStatus() {
   }
 
 
-  
+
 
   // FIXED: Logic for downloading the certificate
   downloadCertificate() {
