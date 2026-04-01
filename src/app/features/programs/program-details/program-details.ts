@@ -24,6 +24,7 @@ export class ProgramDetailsComponent implements OnInit {
   private enrollmentService = inject(EnrollmentService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  coursesFinished:number=0;
 
   @ViewChild('certGenerator') certGenerator!: CertificateComponent;
 
@@ -52,7 +53,7 @@ export class ProgramDetailsComponent implements OnInit {
     
     this.authService.fetchUserDetails();
 
-    console.log('User name:', this.authService.getUserName()); // Debugging line
+    console.log('User name:', this.authService.getUserName()); // sample line
     if (this.programId) {
       this.checkStatus();
       this.loadData();
@@ -86,7 +87,17 @@ export class ProgramDetailsComponent implements OnInit {
       this.courseService.getProgramProgress(this.programId, userId).subscribe({
         next: (res) => {
           if (res.success) {
+
+
+          const totalInProgram = res.data.totalCourses; 
+
+          if (totalInProgram === 0) {
+            res.data.programCompleted = false;
+            res.data.completionPercentage = 0;
+          }
+
             this.progress.set(res.data);
+            this.coursesFinished=res.data.completedCourses;
             
             // CRITICAL FIX: If they completed the program, they are 
             // definitely enrolled. Set this immediately to hide the enroll button.
@@ -115,7 +126,7 @@ checkStatus() {
     const userId = this.authService.getUserId();
     if (!userId || userId === 0) {
       toast.error('Session Expired', { description: 'Please login to enroll.' });
-      this.router.navigate(['/login']);
+      this.router.navigate(['/home']);
       return;
     }
 
