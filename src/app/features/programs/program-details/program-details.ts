@@ -6,7 +6,7 @@ import { CourseService } from '../../../core/services/course-service';
 import { CommonModule } from '@angular/common';
 import { EnrollmentService } from '../../../core/services/enrollment-service';
 import { EnrollmentRequest } from '../../../core/models/enrollment';
-import { toast } from 'ngx-sonner'; 
+import { toast } from 'ngx-sonner';
 import { ProgramProgressResponse } from '../../../core/models/progress';
 import { CertificateComponent } from '../../certificate/certificate';
 
@@ -49,7 +49,7 @@ export class ProgramDetailsComponent implements OnInit {
   ngOnInit() {
     this.programId = Number(this.route.snapshot.paramMap.get('id'));
 
-    
+
     this.authService.fetchUserDetails();
 
     console.log('User name:', this.authService.getUserName()); // Debugging line
@@ -80,14 +80,22 @@ export class ProgramDetailsComponent implements OnInit {
     });
   }
 
- loadProgress() {
+  loadProgress() {
     const userId = this.authService.getUserId();
     if (userId && userId !== 0 && !this.isEditor()) {
       this.courseService.getProgramProgress(this.programId, userId).subscribe({
         next: (res) => {
           if (res.success) {
             this.progress.set(res.data);
-            
+
+            const totalInProgram = res.data.totalCourses;
+
+            if (totalInProgram === 0) {
+              res.data.programCompleted = false;
+              res.data.completionPercentage = 0;
+            }
+
+
             // CRITICAL FIX: If they completed the program, they are 
             // definitely enrolled. Set this immediately to hide the enroll button.
             if (res.data.programCompleted) {
@@ -99,18 +107,18 @@ export class ProgramDetailsComponent implements OnInit {
     }
   }
 
-checkStatus() {
-  const userId = this.authService.getUserId(); 
-  if (userId) {
-    // Calling the updated service (no status sent)
-    this.enrollmentService.checkEnrollmentExists(userId, this.programId).subscribe({
-      next: (exists) => {
-        this.isEnrolled.set(exists);
-        this.cdr.detectChanges();
-      }
-    });
+  checkStatus() {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      // Calling the updated service (no status sent)
+      this.enrollmentService.checkEnrollmentExists(userId, this.programId).subscribe({
+        next: (exists) => {
+          this.isEnrolled.set(exists);
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
-}
   onEnroll() {
     const userId = this.authService.getUserId();
     if (!userId || userId === 0) {
@@ -132,7 +140,7 @@ checkStatus() {
   }
 
 
-  
+
 
   // FIXED: Logic for downloading the certificate
   downloadCertificate() {

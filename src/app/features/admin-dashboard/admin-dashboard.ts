@@ -59,7 +59,7 @@ export class AdminDashboardComponent implements OnInit {
   // --- Computed Values ---
   filteredUsers = computed(() => {
     const role = this.selectedUserRole();
-    if (!role) return this.users(); 
+    if (!role) return this.users();
     return this.users().filter(user => user.role === role);
   });
 
@@ -107,10 +107,10 @@ export class AdminDashboardComponent implements OnInit {
 
   async approveInstructor(email: string) {
 
-       const confirmed = await this.confirmAction(
-    'Approve Instructor?', 
-    `${email} will be approved.`
-  );
+    const confirmed = await this.confirmAction(
+      'Approve Instructor?',
+      `${email} will be approved.`
+    );
 
 
     if (confirmed) {
@@ -126,10 +126,10 @@ export class AdminDashboardComponent implements OnInit {
   async rejectInstructor(email: string) {
 
 
-      const confirmed = await this.confirmAction(
-    'Reject Instructor?', 
-    `${email} will be marked as rejected.`
-  );
+    const confirmed = await this.confirmAction(
+      'Reject Instructor?',
+      `${email} will be marked as rejected.`
+    );
 
     if (confirmed) {
       this.authService.rejectInstructor(email).subscribe({
@@ -142,32 +142,32 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   async confirmAction(message: string, description: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    toast.warning(message, {
-      description: description,
-      action: {
-        label: 'Confirm',
-        onClick: () => resolve(true),
-      },
-      cancel: {
-        label: 'Cancel',
-        onClick: () => resolve(false),
-      },
-      onDismiss: () => resolve(false), // If the toast expires or is swiped away
+    return new Promise((resolve) => {
+      toast.warning(message, {
+        description: description,
+        action: {
+          label: 'Confirm',
+          onClick: () => resolve(true),
+        },
+        cancel: {
+          label: 'Cancel',
+          onClick: () => resolve(false),
+        },
+        onDismiss: () => resolve(false), // If the toast expires or is swiped away
+      });
     });
-  });
-}
+  }
 
 
   async deleteUser(userId: number) {
 
     const confirmed = await this.confirmAction(
-    'Delete User?', 
-    `User with id: ${userId} will permanently removed.`
-  );
+      'Delete User?',
+      `User with id: ${userId} will permanently removed.`
+    );
 
 
-if (confirmed) {
+    if (confirmed) {
       this.authService.deleteUser(userId).subscribe({
         next: () => {
           toast.success('User deleted successfully');
@@ -201,7 +201,7 @@ if (confirmed) {
         });
     });
   }
-  
+
   getAttendancePercentage(present: number, total: number): number {
     if (total === 0) return 0;
     return Math.round((present / total) * 100);
@@ -264,14 +264,21 @@ if (confirmed) {
     });
   }
 
-  deleteEnrollmentRecord(enrollmentId: number) {
-    if (confirm('Are you sure you want to permanently delete this enrollment record?')) {
+  async deleteEnrollmentRecord(enrollmentId: number) {
+
+
+    const confirmed = await this.confirmAction('Delete Enrollment?',
+      `Enrollment with id: ${enrollmentId} will permanently removed.`
+    );
+
+
+    if (confirmed) {
       this.enrollmentService.deleteEnrollment(enrollmentId).subscribe({
         next: () => {
           toast.success('Enrollment deleted successfully.');
           const studentId = this.selectedStudentId();
           const programId = this.selectedProgramId();
-          
+
           if (studentId) {
             this.onStudentFilterChange(studentId);
           } else if (programId) {
