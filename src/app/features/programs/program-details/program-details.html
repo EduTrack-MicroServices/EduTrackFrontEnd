@@ -48,31 +48,32 @@
           </div>
         </div>
 
-     <div class="col-lg-4 text-lg-end mt-5 mt-lg-0">
-  @if (!isEditor()) {
-    @if (progress()?.programCompleted) {
-      <div class="completed-status-card animate__animated animate__tada border-warning p-4 rounded-4 bg-white bg-opacity-10 shadow-lg text-center">
-        <div class="medal-icon mb-2">
-          <i class="bi bi-trophy-fill text-warning fs-1"></i>
-        </div>
-        <h4 class="fw-extrabold mb-1 text-white">Track Completed!</h4>
-        <p class="small text-white-50 mb-3">You've mastered this curriculum.</p>
-        <button class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-sm" (click)="downloadCertificate()">
-          <i class="bi bi-file-earmark-pdf-fill me-2"></i>Download Certificate
-        </button>
-      </div>
-    } 
-    @else if (isEnrolled()) {
-      <div class="enrolled-status-card animate__animated animate__zoomIn">
-        <i class="bi bi-check-circle-fill text-success fs-2 mb-2"></i>
-        <h5 class="mb-0 fw-bold text-white">Active Enrollment</h5>
-        <p class="small text-white-50 mb-2">Progress: {{ progress()?.completionPercentage || 0 }}%</p>
-        <div class="progress bg-white bg-opacity-10" style="height: 6px; border-radius: 10px;">
-          <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" 
-               [style.width.%]="progress()?.completionPercentage || 0"></div>
-        </div>
-      </div>
-    }
+        <div class="col-lg-4 text-lg-end mt-5 mt-lg-0">
+          @if (!isEditor()) {
+          @if (progress()?.programCompleted) {
+          <div
+            class="completed-status-card animate__animated animate__tada border-warning p-4 rounded-4 bg-white bg-opacity-10 shadow-lg text-center">
+            <div class="medal-icon mb-2">
+              <i class="bi bi-trophy-fill text-warning fs-1"></i>
+            </div>
+            <h4 class="fw-extrabold mb-1 text-white">Track Completed!</h4>
+            <p class="small text-white-50 mb-3">You've mastered this curriculum.</p>
+            <button class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-sm" (click)="downloadCertificate()">
+              <i class="bi bi-file-earmark-pdf-fill me-2"></i>Download Certificate
+            </button>
+          </div>
+          }
+          @else if (isEnrolled()) {
+          <div class="enrolled-status-card animate__animated animate__zoomIn">
+            <i class="bi bi-check-circle-fill text-success fs-2 mb-2"></i>
+            <h5 class="mb-0 fw-bold text-white">Active Enrollment</h5>
+            <p class="small text-white-50 mb-2">Progress: {{ progress()?.completionPercentage || 0 }}%</p>
+            <div class="progress bg-white bg-opacity-10" style="height: 6px; border-radius: 10px;">
+              <div class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+                [style.width.%]="progress()?.completionPercentage || 0"></div>
+            </div>
+          </div>
+          }
           @else {
           <div class="d-flex flex-column align-items-lg-end">
             <button class="btn btn-warning btn-lg fw-bold px-5 py-3 shadow-lg transition-all" [disabled]="!canEnroll()"
