@@ -82,23 +82,23 @@ export class CourseFormComponent implements OnInit {
       }
     } else {
       // Form Validation Fallback
-      toast.warning('Invalid Form', { 
-        description: 'Please ensure all required fields are filled out correctly.' 
+      toast.warning('Invalid Form', {
+        description: 'Please ensure all required fields are filled out correctly.'
       });
     }
   }
 
   onCancel() {
-  window.history.back();
-}
+    window.history.back();
+  }
   handleSuccess(msg: string) {
     toast.success(msg, { duration: 3000 }); // Show success toast instead of alert()
-    
+
     // Redirect back to program details
     if (this.programId) {
-        this.router.navigate(['/programs', this.programId]);
+      this.router.navigate(['/programs', this.programId]);
     } else {
-        window.history.back();
+      window.history.back();
     }
   }
 }

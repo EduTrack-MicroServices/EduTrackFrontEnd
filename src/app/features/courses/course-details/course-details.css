@@ -1,5 +1,7 @@
 /* Premium Accents */
-.fw-extrabold { font-weight: 800; }
+.fw-extrabold {
+  font-weight: 800;
+}
 
 .course-icon-bg {
   width: 64px;
@@ -58,8 +60,13 @@
 }
 
 /* Shadow Layering */
-.rounded-4 { border-radius: 1rem !important; }
-.shadow-sm { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05) !important; }
+.rounded-4 {
+  border-radius: 1rem !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.05) !important;
+}
 
 /* Truncate Description */
 .line-clamp-2 {

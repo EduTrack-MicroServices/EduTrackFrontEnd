@@ -25,19 +25,19 @@ export class DashboardComponent implements OnInit {
   today = new Date();
   enrolledPrograms = signal<EnrollmentResponse[]>([]);
   userRole = this.authService.userRole;
-  programDetails = signal<Program[]>([]); 
+  programDetails = signal<Program[]>([]);
 
   programProgress = signal<{ [key: number]: ProgramProgressResponse }>({});
-  
+
   EnrollmentStatusUpdateRequest = {
     status: 'Completed'
   };
- 
 
- 
+
+
   // Dynamic Stats
- totalEnrolled = computed(() => this.enrolledPrograms().length);
-   completedCount = computed(() => 
+  totalEnrolled = computed(() => this.enrolledPrograms().length);
+  completedCount = computed(() =>
     Object.values(this.programProgress()).filter(p => p.programCompleted).length
   );
   overallCompletion = computed(() => {
@@ -52,12 +52,12 @@ export class DashboardComponent implements OnInit {
       this.loadMyEnrollments();
     }
   }
-// NEW: Helper to remove enrollments for programs that no longer exist
+  // NEW: Helper to remove enrollments for programs that no longer exist
   private handleOrphanedEnrollment(programId: number) {
-    this.enrolledPrograms.update(enrollments => 
+    this.enrolledPrograms.update(enrollments =>
       enrollments.filter(e => e.programId !== programId)
     );
-    
+
     // Also remove from progress map to keep stats accurate
     this.programProgress.update(prev => {
       const updated = { ...prev };
@@ -66,7 +66,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-loadMyEnrollments() {
+  loadMyEnrollments() {
     const userId = this.authService.getUserId();
     this.enrollmentService.getEnrollmentsByStudent(userId).subscribe({
       next: (res) => {
@@ -87,17 +87,17 @@ loadMyEnrollments() {
       this.programService.getProgramProgress(enroll.programId, userId).subscribe({
         next: (res) => {
           if (res.success) {
-            
+
             // Update the map
             this.programProgress.update(prev => ({
               ...prev,
               [enroll.programId]: res.data
             }));
-           
+
             // LOGIC FIX: If backend says program is 100% but enrollment is still 'Active'
-          
+
             if (res.data.programCompleted && enroll.status !== 'Completed') {
-             
+
               this.syncEnrollmentStatus(enroll.enrollmentId);
             }
           }
@@ -115,8 +115,8 @@ loadMyEnrollments() {
     this.enrollmentService.updateStatus(programId, this.EnrollmentStatusUpdateRequest).subscribe({
       next: () => {
         // Update local state to reflect the change immediately
-        this.enrolledPrograms.update(enrollments => enrollments.map(enroll => 
-          enroll.programId === programId ? { ...enroll, status: 'Completed' } : enroll    ));   
+        this.enrolledPrograms.update(enrollments => enrollments.map(enroll =>
+          enroll.programId === programId ? { ...enroll, status: 'Completed' } : enroll));
       },
       error: () => toast.error('Failed to sync enrollment status')
     });
@@ -127,7 +127,7 @@ loadMyEnrollments() {
     return this.programProgress()[programId]?.completionPercentage || 0;
   }
 
-getMyProgramDetails() {
+  getMyProgramDetails() {
     this.programDetails.set([]); // Clear previous details
     const currentEnrollments = this.enrolledPrograms();
 

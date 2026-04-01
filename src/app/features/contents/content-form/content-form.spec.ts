@@ -1,17 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+import { ContentFormComponent } from './content-form';
 
-import { ContentForm } from './content-form';
-
-describe('ContentForm', () => {
-  let component: ContentForm;
-  let fixture: ComponentFixture<ContentForm>;
+describe('ContentFormComponent', () => {
+  let component: ContentFormComponent;
+  let fixture: ComponentFixture<ContentFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ContentForm],
+      imports: [ContentFormComponent],
+      providers: [
+        provideHttpClient(),
+        provideRouter([])
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ContentForm);
+    fixture = TestBed.createComponent(ContentFormComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

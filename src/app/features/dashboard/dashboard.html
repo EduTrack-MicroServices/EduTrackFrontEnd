@@ -1,5 +1,5 @@
 <div class="dashboard-wrapper p-4 bg-light min-vh-100">
-  
+
   <header class="d-flex justify-content-between align-items-center mb-5">
     <div>
       <h2 class="fw-bold text-dark mb-1">Scholar Dashboard</h2>
@@ -59,62 +59,64 @@
   <div class="row g-4">
     <div class="col-lg-8">
       <h5 class="fw-bold text-dark mb-4">Your Learning Path</h5>
-      
+
       @for (enroll of enrolledPrograms(); track enroll.enrollmentId) {
-        @if (programDetails().find(p => p.programId === enroll.programId)) {
-        <div class="course-item-card mb-3 p-3 bg-white rounded-4 shadow-sm border-0 transition-hover">
-          <div class="row align-items-center">
-            <div class="col-auto">
-              <div class="program-avatar text-white fw-bold bg-primary shadow-sm">
-                {{ programDetails().find(p => p.programId === enroll.programId)?.name?.charAt(0) || 'P' }}
-              </div>
-            </div>
-            
-            <div class="col">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <h6 class="fw-bold text-dark mb-0">
-                  {{ programDetails().find(p => p.programId === enroll.programId)?.name || 'Loading Program...' }}
-                </h6>
-                <span class="small fw-bold text-muted">{{ getProgress(enroll.programId) | number:'1.0-0' }}%</span>
-              </div>
-              
-              <div class="progress mb-2" style="height: 6px; background-color: #f0f2f5;">
-                <div class="progress-bar rounded-pill" 
-                     [class.bg-success]="getProgress(enroll.programId) === 100"
-                     [class.bg-primary]="getProgress(enroll.programId) < 100"
-                     [style.width.%]="getProgress(enroll.programId)">
-                </div>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>Joined {{ enroll.enrolledDate | date:'mediumDate' }}</small>
-                
-              @if (programProgress()[enroll.programId]?.programCompleted){
-                  <span class="badge-custom bg-success-soft text-success small">
-                    <i class="bi bi-award-fill me-1"></i>Completed
-                  </span>
-                } @else {
-                  <span class="badge-custom bg-primary-soft text-primary small">
-                    <i class="bi bi-play-circle-fill me-1"></i>Active
-                  </span>
-                }
-              </div>
-            </div>
-
-            <div class="col-auto ps-4">
-              <button class="btn btn-primary rounded-pill btn-sm px-4 py-2 fw-bold shadow-sm" [routerLink]="['/programs', enroll.programId]">
-                Continue
-              </button>
+      @if (programDetails().find(p => p.programId === enroll.programId)) {
+      <div class="course-item-card mb-3 p-3 bg-white rounded-4 shadow-sm border-0 transition-hover">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="program-avatar text-white fw-bold bg-primary shadow-sm">
+              {{ programDetails().find(p => p.programId === enroll.programId)?.name?.charAt(0) || 'P' }}
             </div>
           </div>
+
+          <div class="col">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <h6 class="fw-bold text-dark mb-0">
+                {{ programDetails().find(p => p.programId === enroll.programId)?.name || 'Loading Program...' }}
+              </h6>
+              <span class="small fw-bold text-muted">{{ getProgress(enroll.programId) | number:'1.0-0' }}%</span>
+            </div>
+
+            <div class="progress mb-2" style="height: 6px; background-color: #f0f2f5;">
+              <div class="progress-bar rounded-pill" [class.bg-success]="getProgress(enroll.programId) === 100"
+                [class.bg-primary]="getProgress(enroll.programId) < 100"
+                [style.width.%]="getProgress(enroll.programId)">
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>Joined {{ enroll.enrolledDate |
+                date:'mediumDate' }}</small>
+
+              @if (programProgress()[enroll.programId]?.programCompleted){
+              <span class="badge-custom bg-success-soft text-success small">
+                <i class="bi bi-award-fill me-1"></i>Completed
+              </span>
+              } @else {
+              <span class="badge-custom bg-primary-soft text-primary small">
+                <i class="bi bi-play-circle-fill me-1"></i>Active
+              </span>
+              }
+            </div>
+          </div>
+
+          <div class="col-auto ps-4">
+            <button class="btn btn-primary rounded-pill btn-sm px-4 py-2 fw-bold shadow-sm"
+              [routerLink]="['/programs', enroll.programId]">
+              Continue
+            </button>
+          </div>
         </div>
+      </div>
       }} @empty {
-        <div class="empty-state text-center p-5 bg-white rounded-4 border-dashed">
-          <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" class="mb-3 opacity-50" alt="empty">
-          <h6 class="fw-bold">No active enrollments</h6>
-          <p class="text-muted small mb-3">Explore our catalog to start your learning journey.</p>
-          <button class="btn btn-primary rounded-pill px-4" routerLink="/program-list">Browse Programs</button>
-        </div>
+      <div class="empty-state text-center p-5 bg-white rounded-4 border-dashed">
+        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" class="mb-3 opacity-50"
+          alt="empty">
+        <h6 class="fw-bold">No active enrollments</h6>
+        <p class="text-muted small mb-3">Explore our catalog to start your learning journey.</p>
+        <button class="btn btn-primary rounded-pill px-4" routerLink="/program-list">Browse Programs</button>
+      </div>
       }
     </div>
 
