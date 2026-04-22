@@ -123,7 +123,7 @@ export const routes: Routes = [
         path: 'courses/:courseId/assessment', component: AssessmentViewComponent
     },
     {
-        path: 'courses/:courseId/assessment/:assessmentId/take', component: AssessmentTakeComponent
+        path: 'courses/:courseId/assessment/:assessmentId/take', component: AssessmentTakeComponent,
     },
     {
         path: 'courses/:courseId/assessment/score', component: AssessmentScoreComponent
