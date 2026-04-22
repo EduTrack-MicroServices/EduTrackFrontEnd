@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { timeout } from 'rxjs';
 import { toast } from 'ngx-sonner';
 
@@ -29,34 +30,39 @@ export class AdminDashboardComponent implements OnInit {
   private attendanceService = inject(AttendanceService);
   private enrollmentService = inject(EnrollmentService);
   private courseService = inject(CourseService);
+  private route = inject(ActivatedRoute);
 
   // --- State Signals ---
   users = signal<UserResponse[]>([]);
   loading = signal<boolean>(false);
-  
-  // NEW: User Role Filter Signal
   selectedUserRole = signal<string>('');
-
   attendanceMap = signal<Map<number, AttendanceSummaryResponse>>(new Map());
-  
   enrollments = signal<EnrollmentResponse[]>([]);
   enrollmentLoading = signal<boolean>(false);
   selectedStudentId = signal<number | ''>('');
   selectedProgramId = signal<number | ''>('');
-
   programs = signal<Program[]>([]);
 
+  // Track active views from the Sidebar URL params
+  activeViews = signal<string[]>(['USERS']);
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      if (params['views']) {
+        this.activeViews.set(params['views'].split(','));
+      } else {
+        this.activeViews.set(['USERS']);
+      }
+    });
+  }
+
   // --- Computed Values ---
-  // NEW: Real-time filtered users array based on the selected dropdown value
   filteredUsers = computed(() => {
     const role = this.selectedUserRole();
-    if (!role) {
-      return this.users(); // Return all if no filter is selected
-    }
+    if (!role) return this.users(); 
     return this.users().filter(user => user.role === role);
   });
 
-  // Calculate stats using the base 'users()' signal so the top cards don't change when filtering
   totalInstructors = computed(() => this.users().filter(u => u.role === 'INSTRUCTOR').length);
   totalStudents = computed(() => this.users().filter(u => u.role === 'STUDENT').length);
 
@@ -66,17 +72,10 @@ export class AdminDashboardComponent implements OnInit {
     this.loadPrograms();
   }
 
-  // ==========================================
-  // PROGRAM MANAGEMENT (For Dropdown & Display)
-  // ==========================================
   loadPrograms() {
     this.courseService.getAllPrograms().subscribe({
-      next: (res) => {
-        this.programs.set(res.data || []);
-      },
-      error: () => {
-        toast.error('Failed to load programs.');
-      }
+      next: (res) => this.programs.set(res.data || []),
+      error: () => toast.error('Failed to load programs.')
     });
   }
 
@@ -85,14 +84,9 @@ export class AdminDashboardComponent implements OnInit {
     return prog ? prog.name : 'Unknown Program';
   }
 
-  // ==========================================
-  // USER MANAGEMENT
-  // ==========================================
   loadUsers() {
     this.loading.set(true);
-    // Reset user filter on manual refresh
     this.selectedUserRole.set('');
-    
     this.authService.getAllUsers().subscribe({
       next: (res) => {
         this.users.set(res.data);
@@ -111,8 +105,15 @@ export class AdminDashboardComponent implements OnInit {
     return user ? user.userName : 'Unknown User';
   }
 
-  approveInstructor(email: string) {
-    if (confirm(`Approve instructor ${email}?`)) {
+  async approveInstructor(email: string) {
+
+       const confirmed = await this.confirmAction(
+    'Approve Instructor?', 
+    `${email} will be approved.`
+  );
+
+
+    if (confirmed) {
       this.authService.approveInstructor(email).subscribe({
         next: () => {
           toast.success('Instructor APPROVED');
@@ -122,8 +123,15 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  rejectInstructor(email: string) {
-    if (confirm(`Reject instructor ${email}? This will set status to REJECTED.`)) {
+  async rejectInstructor(email: string) {
+
+
+      const confirmed = await this.confirmAction(
+    'Reject Instructor?', 
+    `${email} will be marked as rejected.`
+  );
+
+    if (confirmed) {
       this.authService.rejectInstructor(email).subscribe({
         next: () => {
           toast.warning('Instructor REJECTED');
@@ -133,8 +141,33 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  deleteUser(userId: number) {
-    if (confirm('Are you sure you want to PERMANENTLY delete this user? This action cannot be undone.')) {
+  async confirmAction(message: string, description: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    toast.warning(message, {
+      description: description,
+      action: {
+        label: 'Confirm',
+        onClick: () => resolve(true),
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => resolve(false),
+      },
+      onDismiss: () => resolve(false), // If the toast expires or is swiped away
+    });
+  });
+}
+
+
+  async deleteUser(userId: number) {
+
+    const confirmed = await this.confirmAction(
+    'Delete User?', 
+    `User with id: ${userId} will permanently removed.`
+  );
+
+
+if (confirmed) {
       this.authService.deleteUser(userId).subscribe({
         next: () => {
           toast.success('User deleted successfully');
@@ -145,12 +178,8 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  // ==========================================
-  // ATTENDANCE MANAGEMENT
-  // ==========================================
   loadAllAttendances() {
     const currentUsers = this.users();
-    
     currentUsers.forEach(user => {
       this.attendanceService.getAttendanceSummary(user.userId)
         .pipe(timeout(4000))
@@ -178,13 +207,9 @@ export class AdminDashboardComponent implements OnInit {
     return Math.round((present / total) * 100);
   }
 
-  // ==========================================
-  // ENROLLMENT MANAGEMENT
-  // ==========================================
   loadAllEnrollments() {
     this.selectedStudentId.set('');
     this.selectedProgramId.set('');
-    
     this.enrollmentLoading.set(true);
     this.enrollmentService.getAllEnrollments().subscribe({
       next: (res) => {
@@ -206,7 +231,6 @@ export class AdminDashboardComponent implements OnInit {
     }
     this.selectedProgramId.set('');
     this.enrollmentLoading.set(true);
-    
     this.enrollmentService.getEnrollmentsByStudent(Number(userId)).subscribe({
       next: (res) => {
         this.enrollments.set(res.data || []);
@@ -227,7 +251,6 @@ export class AdminDashboardComponent implements OnInit {
     }
     this.selectedStudentId.set('');
     this.enrollmentLoading.set(true);
-    
     this.enrollmentService.getEnrollmentsByProgram(Number(programId)).subscribe({
       next: (res) => {
         this.enrollments.set(res.data || []);
@@ -246,7 +269,6 @@ export class AdminDashboardComponent implements OnInit {
       this.enrollmentService.deleteEnrollment(enrollmentId).subscribe({
         next: () => {
           toast.success('Enrollment deleted successfully.');
-          
           const studentId = this.selectedStudentId();
           const programId = this.selectedProgramId();
           
@@ -258,9 +280,7 @@ export class AdminDashboardComponent implements OnInit {
             this.loadAllEnrollments();
           }
         },
-        error: (err) => {
-          toast.error(err.error?.message || 'Failed to delete enrollment.');
-        }
+        error: (err) => toast.error(err.error?.message || 'Failed to delete enrollment.')
       });
     }
   }

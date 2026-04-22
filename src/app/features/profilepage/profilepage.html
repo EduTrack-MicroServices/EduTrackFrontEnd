@@ -1,0 +1,117 @@
+<div class="profile-page-wrapper">
+  <div class="profile-header-banner">
+    <div class="banner-content">
+      <h1>My Profile</h1>
+      <p>Manage your account settings and track your attendance.</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-spinner-container">
+      <div class="spinner"></div>
+      <p>Loading profile data...</p>
+    </div>
+  } 
+  @else if (userProfile(); as profile) {
+    <div class="profile-content-grid">
+      
+      <div class="card profile-overview-card">
+        
+        <div class="avatar-container">
+          <div class="avatar-circle">
+            {{ profile.userName?.charAt(0) | uppercase }}
+          </div>
+        </div>
+        
+        <h2 class="user-name">{{ profile.userName | titlecase }}</h2>
+        <span class="role-badge" [ngClass]="profile.role?.toLowerCase()">
+          {{ profile.role }}
+        </span>
+        
+        <div class="user-info-list">
+          
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ profile.email }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value">{{ profile.phoneNumber || 'Not provided' }}</span>
+          </div>
+
+          @if (attendanceSummary(); as attendance) {
+            <div class="attendance-section">
+              <div class="attendance-header">
+                <span class="info-label text-dark">Overall Attendance</span>
+                <span class="info-value text-bold">{{ attendancePercentage() }}%</span>
+              </div>
+              
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" 
+                     [style.width.%]="attendancePercentage()"
+                     [ngClass]="{
+                       'bg-good': attendancePercentage() >= 75, 
+                       'bg-warning': attendancePercentage() >= 50 && attendancePercentage() < 75, 
+                       'bg-danger': attendancePercentage() < 50
+                     }">
+                </div>
+              </div>
+
+              <div class="attendance-stats">
+                <span class="stat-item text-success">
+                  {{ attendance.presentDays }} Present
+                </span>
+                <span class="stat-item text-danger">
+                  {{ attendance.absentDays }} Absent
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="card settings-card">
+        <div class="card-header">
+          <h3>Security & Password</h3>
+          <p class="subtitle">Update your password to keep your account secure.</p>
+        </div>
+
+        <div class="alerts-container">
+          @if (successMessage()) {
+            <div class="alert alert-success">{{ successMessage() }}</div>
+          }
+          @if (errorMessage()) {
+            <div class="alert alert-error">{{ errorMessage() }}</div>
+          }
+        </div>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="styled-form">
+          
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" id="currentPassword" formControlName="currentPassword" class="form-control" placeholder="Enter current password">
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" formControlName="newPassword" class="form-control" placeholder="Minimum 6 characters">
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control" placeholder="Re-enter new password">
+            
+            @if (passwordForm.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched) {
+              <span class="validation-error">Passwords do not match.</span>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid">Update Password</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+</div>

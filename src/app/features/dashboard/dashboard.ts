@@ -6,10 +6,12 @@ import { EnrollmentResponse } from '../../core/models/enrollment';
 import { EnrollmentService } from '../../core/services/enrollment-service';
 import { Program } from '../../core/models/course';
 import { CourseService } from '../../core/services/course-service';
+import { toast } from 'ngx-sonner'; // <-- Added Sonner for notifications
+import { ProgramProgressResponse } from '../../core/models/progress';
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true, // Assuming standalone based on previous code
+  standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -23,55 +25,136 @@ export class DashboardComponent implements OnInit {
   today = new Date();
   enrolledPrograms = signal<EnrollmentResponse[]>([]);
   userRole = this.authService.userRole;
-  programDetails = signal<Program[]>([]); // For students to show enrolled program details
+  programDetails = signal<Program[]>([]); 
 
+  programProgress = signal<{ [key: number]: ProgramProgressResponse }>({});
+  
+  EnrollmentStatusUpdateRequest = {
+    status: 'Completed'
+  };
+ 
+
+ 
   // Dynamic Stats
-  totalEnrolled = computed(() => this.enrolledPrograms().length);
-  completedCount = computed(() => this.enrolledPrograms().filter(e => e.status === 'Completed').length);
+ totalEnrolled = computed(() => this.enrolledPrograms().length);
+   completedCount = computed(() => 
+    Object.values(this.programProgress()).filter(p => p.programCompleted).length
+  );
+  overallCompletion = computed(() => {
+    const total = this.totalEnrolled();
+    if (total === 0) return 0;
+    const completed = this.completedCount();
+    return (completed / total) * 100;
+  });
 
   ngOnInit() {
     if (this.userRole() === 'STUDENT') {
       this.loadMyEnrollments();
-     
     }
   }
-
-   getMyProgramDetails() {
-    this.programDetails.set([]); // Clear previous details
-   
-    console.log('Fetching program details for enrolled programs:', this.enrolledPrograms());
-    // Fetch details for each enrolled program  
-
-    this.enrolledPrograms().forEach(enroll => {
-      this.programService.getProgramById(enroll.programId).subscribe({
-        next: (res) => {
-          if (res.success) {
-            this.programDetails.update(details => [...details, res.data]);
-            console.log('Fetched program details for programId:', enroll.programId, res.data);
-          }
-        },
-        error: (err) => console.error('Error fetching program details:', err)
-      });
+// NEW: Helper to remove enrollments for programs that no longer exist
+  private handleOrphanedEnrollment(programId: number) {
+    this.enrolledPrograms.update(enrollments => 
+      enrollments.filter(e => e.programId !== programId)
+    );
+    
+    // Also remove from progress map to keep stats accurate
+    this.programProgress.update(prev => {
+      const updated = { ...prev };
+      delete updated[programId];
+      return updated;
     });
-   }
+  }
 
-
-
-  loadMyEnrollments() {
+loadMyEnrollments() {
     const userId = this.authService.getUserId();
     this.enrollmentService.getEnrollmentsByStudent(userId).subscribe({
       next: (res) => {
         if (res.success) {
           this.enrolledPrograms.set(res.data);
-           this.getMyProgramDetails();
+          // Trigger these side-effects after enrollments are set
+          this.getMyProgramDetails();
+          this.loadAllProgress();
         }
       },
-      error: (err) => console.error('Dashboard Error:', err)
+      error: () => toast.error('Failed to sync enrollments')
     });
   }
 
+  loadAllProgress() {
+    const userId = this.authService.getUserId();
+    this.enrolledPrograms().forEach(enroll => {
+      this.programService.getProgramProgress(enroll.programId, userId).subscribe({
+        next: (res) => {
+          if (res.success) {
+            
+            // Update the map
+            this.programProgress.update(prev => ({
+              ...prev,
+              [enroll.programId]: res.data
+            }));
+           
+            // LOGIC FIX: If backend says program is 100% but enrollment is still 'Active'
+          
+            if (res.data.programCompleted && enroll.status !== 'Completed') {
+             
+              this.syncEnrollmentStatus(enroll.enrollmentId);
+            }
+          }
+        }
+      });
+    });
+  }
+
+  private syncEnrollmentStatus(programId: number) {
+    // Optional: Call your enrollment service to update the status in the DB
+    // to match the 100% progress found in the course_completion table.
+
+
+
+    this.enrollmentService.updateStatus(programId, this.EnrollmentStatusUpdateRequest).subscribe({
+      next: () => {
+        // Update local state to reflect the change immediately
+        this.enrolledPrograms.update(enrollments => enrollments.map(enroll => 
+          enroll.programId === programId ? { ...enroll, status: 'Completed' } : enroll    ));   
+      },
+      error: () => toast.error('Failed to sync enrollment status')
+    });
+    console.log(`Syncing enrollment for program ${programId} to COMPLETED`);
+  }
+  // Helper method for the template to get progress percentage
+  getProgress(programId: number): number {
+    return this.programProgress()[programId]?.completionPercentage || 0;
+  }
+
+getMyProgramDetails() {
+    this.programDetails.set([]); // Clear previous details
+    const currentEnrollments = this.enrolledPrograms();
+
+    currentEnrollments.forEach(enroll => {
+      this.programService.getProgramById(enroll.programId).subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            // Program exists: add to details list
+            this.programDetails.update(details => [...details, res.data]);
+          } else {
+            // Program exists in Enrollment but not in Program table (Soft-deleted or Orphanded)
+            this.handleOrphanedEnrollment(enroll.programId);
+          }
+        },
+        error: (err) => {
+          console.error(`Program ${enroll.programId} not found or deleted:`, err);
+          // If the error is a 404, it means the admin deleted the program
+          this.handleOrphanedEnrollment(enroll.programId);
+        }
+      });
+    });
+  }
   onLogout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    toast.info('Logged Out', {
+      description: 'You have been successfully logged out.'
+    });
+    this.router.navigate(['/']); // Redirect to home page after logout
   }
 }

@@ -18,113 +18,156 @@ import { AssessmentTakeComponent } from './features/assessment/assessment-take/a
 import { AssessmentViewComponent } from './features/assessment/assessment-view/assessment-view';
 import { AssessmentCreateComponent } from './features/assessment/assessment-create/assessment-create';
 import { HomeComponent } from './features/home/home';
+import { Analysispage } from './features/analysispage/analysispage';
+import { Studentprogress } from './features/studentprogress/studentprogress';
+import { Profilepage } from './features/profilepage/profilepage';
+import { guestGuard } from './core/guards/guest-guard';
 
 export const routes: Routes = [
-    {
-        path: 'login', component: LoginComponent
-    },
-    {
-        path:'home',component:HomeComponent
-    },
-    {
-        path: 'register', component: RegisterComponent
-    },
-    {
-        path: 'dashboard', component: DashboardComponent,
-          canActivate: [authGuard],
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [guestGuard],
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'admin-dashboard',
+    component: AdminDashboardComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'program-list',
+    component: ProgramListComponent,
+    canActivate: [authGuard],
+  },
 
-    },
-    {
-        path: 'admin-dashboard',
-        component: AdminDashboardComponent,
-        canActivate: [authGuard, roleGuard],
-        data: { role: 'ADMIN' }
-    },
-    {
-        path: 'program-list', component: ProgramListComponent,
-        canActivate: [authGuard],
+  {
+    path: 'programs/new',
+    component: ProgramFormComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['INSTRUCTOR', 'ADMIN'] },
+  },
+  {
+    path: 'programs/edit/:id',
+    component: ProgramFormComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['INSTRUCTOR', 'ADMIN'] },
+  },
+  {
+    path: 'student-progress',
+    component: Studentprogress,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'analysispage/:studentId',
+    component: Analysispage,
+    canActivate: [authGuard],
+  },
+  { path: 'profile', component: Profilepage },
 
-    },
+  {
+    path: 'programs/:id',
+    component: ProgramDetailsComponent,
+    canActivate: [authGuard],
+  },
 
-    {
-        path: 'programs/new', component: ProgramFormComponent,
-        canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
-    },
-    {
-        path: 'programs/edit/:id',
-        component: ProgramFormComponent,
-        canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
-    },
+  {
+    path: 'programs/:programId/add-course',
+    component: CourseFormComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['INSTRUCTOR', 'ADMIN'] },
+  },
+  {
+    path: 'courses/edit/:courseId',
+    component: CourseFormComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['INSTRUCTOR', 'ADMIN'] },
+  },
+  {
+    path: 'programs/:programId/courses/:courseId',
+    component: CourseDetailsComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'courses/:courseId',
+    component: CourseDetailsComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'programs/:programId/courses/:courseId/add-module',
+    component: ModuleFormComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'modules/edit/:moduleId',
+    component: ModuleFormComponent,
+    canActivate: [authGuard],
+  },
 
-    {
-        path: 'programs/:id', component: ProgramDetailsComponent, canActivate: [authGuard]
-    },
+  {
+    path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer',
+    component: ModuleViewerComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'modules/:moduleId/add-content',
+    component: ContentFormComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'modules/:moduleId/edit-content/:contentId',
+    component: ContentFormComponent,
+    canActivate: [authGuard],
+  },
 
-    {
-        path: 'programs/:programId/add-course',
-        component: CourseFormComponent, canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
-    },
-    {
-        path: 'courses/edit/:courseId', component: CourseFormComponent, canActivate: [authGuard, roleGuard],
-        data: { role: 'INSTRUCTOR' }
-    },
-    {
-        path: 'programs/:programId/courses/:courseId',
-        component: CourseDetailsComponent, canActivate: [authGuard],
-    
-    },
-    {
-        path: 'courses/:courseId',
-        component: CourseDetailsComponent,
-        canActivate: [authGuard]
-    },
-    {
-        path: 'programs/:programId/courses/:courseId/add-module',
-        component: ModuleFormComponent,
-        canActivate: [authGuard]
-    },
-    {
-        path: 'modules/edit/:moduleId',
-        component: ModuleFormComponent,
-        canActivate: [authGuard]
-    },
-
-    {
-        path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer', 
-        component: ModuleViewerComponent, canActivate: [authGuard]
-    },
-    {
-            path: 'modules/:moduleId/add-content', 
-            component: ContentFormComponent, canActivate: [authGuard]
-    },
-    {
-  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
-},
-{
-  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
-},
-{
-  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
-},
-{
-  path: 'courses/:courseId/assessment/score',component: AssessmentScoreComponent
-},
-    {
-  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
-},
-{
-  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
-},
-{
-  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
-},
-{
-  path: 'courses/:courseId/assessment/score',component: AssessmentScoreComponent
-},
-    {
-        path: '', redirectTo: 'home', pathMatch: 'full'
-    }
+  {
+    path: 'courses/:courseId/assessment/create',
+    component: AssessmentCreateComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment',
+    component: AssessmentViewComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment/:assessmentId/take',
+    component: AssessmentTakeComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment/score',
+    component: AssessmentScoreComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment/create',
+    component: AssessmentCreateComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment/:assessmentId/edit',
+    component: AssessmentCreateComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment',
+    component: AssessmentViewComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment/:assessmentId/take',
+    component: AssessmentTakeComponent,
+  },
+  {
+    path: 'courses/:courseId/assessment/result',
+    component: AssessmentScoreComponent,
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
 ];

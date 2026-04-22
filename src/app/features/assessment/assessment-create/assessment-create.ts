@@ -1,140 +1,228 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AssessmentService } from '../../../core/services/assessment-service';
+import { toast } from 'ngx-sonner'; // Import toast
 
 @Component({
   selector: 'app-assessment-create',
   standalone: true,
-  imports: [FormsModule, CommonModule],
-  templateUrl: './assessment-create.html'
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './assessment-create.html',
 })
 export class AssessmentCreateComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private api = inject(AssessmentService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
+  bulkJsonInput = new FormControl('');
+  isBulkMode = false; // Toggle for the UI
+
+  today = new Date().toISOString().split('T')[0];
   courseId!: number;
+  programId!: number;
+  assessmentId: number | null = null;
+  isEditMode = false;
+
   questions: any[] = [];
   questionCount = 0;
-  errorMessage = '';
+  readonly REQUIRED_COUNT = 10;
 
-  // Data model for adding a new question (matching your Java Entity)
-  newQuestion = {
-    courseId: 0,
-    question: '',
-    option1: '',
-    option2: '',
-    option3: '',
-    option4: '',
-    answer: ''
-  };
+  // Feedback/Error states
+  bankMessage = '';
+  serverErrorMessage = '';
 
-  // Data model for the Assessment itself
-  assessment = {
-    courseId: 0,
-    type: 'QUIZ',
-    numberOfQuestions: 0,
-    maxMarks: 0,
-    dueDate: '',
-    status: 'ASSIGNED'
-  };
+  // Assessment Form
+  assessmentForm = new FormGroup({
+    courseId: new FormControl(0),
+    type: new FormControl('QUIZ'),
+    numberOfQuestions: new FormControl({ value: 10, disabled: true }),
+    maxMarks: new FormControl({ value: 10, disabled: true }),
+    dueDate: new FormControl('', [Validators.required]),
+    status: new FormControl('ASSIGNED'),
+  });
 
-  constructor(
-    private route: ActivatedRoute,
-    private api: AssessmentService,
-    private router: Router,
-    private cdr: ChangeDetectorRef // Injected to fix UI refresh issue
-  ) {}
+  // Question Form
+  questionForm = new FormGroup({
+    courseId: new FormControl(0),
+    question: new FormControl('', Validators.required),
+    option1: new FormControl('', Validators.required),
+    option2: new FormControl('', Validators.required),
+    option3: new FormControl(''),
+    option4: new FormControl(''),
+    answer: new FormControl('', Validators.required),
+  });
 
   ngOnInit() {
     this.courseId = Number(this.route.snapshot.paramMap.get('courseId'));
-    this.assessment.courseId = this.courseId;
-    this.newQuestion.courseId = this.courseId;
+    this.programId = Number(this.route.snapshot.paramMap.get('programId'));
+    const aId = this.route.snapshot.paramMap.get('assessmentId');
+
+    this.assessmentForm.patchValue({ courseId: this.courseId });
+    this.questionForm.patchValue({ courseId: this.courseId });
+
+    if (aId) {
+      this.isEditMode = true;
+      this.assessmentId = Number(aId);
+      this.loadExistingAssessment();
+    }
+
     this.loadQuestions();
+  }
+
+  loadExistingAssessment() {
+    if (!this.assessmentId) return;
+
+    this.api.getAssessmentById(this.assessmentId).subscribe({
+      next: (res: any) => {
+        const data = res?.data || res;
+        this.assessmentForm.patchValue({
+          dueDate: data.dueDate ? new Date(data.dueDate).toISOString().split('T')[0] : '',
+          status: data.status,
+          type: data.type || 'QUIZ'
+        });
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        toast.error('Failed to load assessment details');
+      }
+    });
   }
 
   loadQuestions() {
     this.api.getQuestionsByCourseId(this.courseId).subscribe({
       next: (res: any) => {
-        this.questions = res.data || [];
+        this.questions = res.data || res || [];
         this.questionCount = this.questions.length;
-        
-        // This forces Angular to refresh the UI immediately
-        this.cdr.detectChanges(); 
+        this.updateBankStatus();
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error fetching questions:', err);
-      }
+      error: () => toast.error('Error loading question bank'),
     });
   }
 
-  // VALIDATION: Prevents selecting more questions than available
-  checkMaxQuestions() {
-    if (this.assessment.numberOfQuestions > this.questionCount) {
-      this.assessment.numberOfQuestions = this.questionCount;
-      this.errorMessage = `Only ${this.questionCount} questions available in the bank.`;
-    } else if (this.assessment.numberOfQuestions < 0) {
-      this.assessment.numberOfQuestions = 0;
+  updateBankStatus() {
+    if (this.questionCount < this.REQUIRED_COUNT) {
+      this.bankMessage = `Add ${this.REQUIRED_COUNT - this.questionCount} more questions to enable saving.`;
     } else {
-      this.errorMessage = '';
+      this.bankMessage = '';
     }
-    this.updateMarks();
-  }
-
-  updateMarks() {
-    // Logic: 1 Mark per question
-    this.assessment.maxMarks = (this.assessment.numberOfQuestions || 0) * 1;
   }
 
   addQuestionToBank() {
-    // Ensure all fields required by Java @NotBlank are filled
-    if (!this.newQuestion.question || !this.newQuestion.answer || !this.newQuestion.option1) {
-      this.errorMessage = "Please fill in all question fields and the correct answer.";
+    if (this.questionForm.invalid) {
+      toast.warning('Please fill in all required question fields');
       return;
     }
 
-    this.api.createQuestion(this.newQuestion).subscribe({
+    this.api.createQuestion(this.questionForm.value).subscribe({
       next: () => {
-        this.resetQuestionForm();
-        this.loadQuestions(); // Refreshes list and questionCount
-        this.errorMessage = '';
+        toast.success('Question added to bank');
+        this.questionForm.reset({ courseId: this.courseId });
+        this.loadQuestions();
       },
-      error: () => {
-        this.errorMessage = "Failed to save the question.";
-      }
+      error: (err) => toast.error(err.error?.message || 'Error saving question'),
     });
   }
 
-  resetQuestionForm() {
-    this.newQuestion = {
-      courseId: this.courseId,
-      question: '',
-      option1: '',
-      option2: '',
-      option3: '',
-      option4: '',
-      answer: ''
-    };
+  deleteQuestion(id: number) {
+    this.api.deleteQuestion(id).subscribe({
+      next: () => {
+        toast.success('Question deleted successfully');
+        this.loadQuestions();
+      },
+      error: () => toast.error('Failed to delete question')
+    });
   }
 
-  deleteQuestion(questionId: number) {
-    if (confirm('Permanently delete this question from the bank?')) {
-      this.api.deleteQuestion(questionId).subscribe(() => {
-        this.loadQuestions();
+  submitAssessment() {
+    this.serverErrorMessage = '';
+    const selectedDate = this.assessmentForm.get('dueDate')?.value;
+
+    if (selectedDate && selectedDate < this.today) {
+      toast.error('Due date cannot be in the past');
+      return;
+    }
+
+    if (this.questionCount < this.REQUIRED_COUNT) {
+      toast.error(`Incomplete Bank: Need ${this.REQUIRED_COUNT} questions`);
+      return;
+    }
+
+    const payload = this.assessmentForm.getRawValue();
+
+    if (this.isEditMode && this.assessmentId) {
+      this.api.updateAssessment(this.assessmentId, payload).subscribe({
+        next: () => {
+          toast.success('Assessment updated successfully');
+         window.history.back();
+        },
+        error: (err) => this.handleError(err)
+      });
+    } else {
+      this.api.createAssessment(payload).subscribe({
+        next: () => {
+          toast.success('Assessment created successfully');
+        window.history.back();
+        },
+        error: (err) => this.handleError(err)
       });
     }
   }
 
-  createAssessment() {
-    if (this.assessment.numberOfQuestions <= 0) {
-      this.errorMessage = "Please select at least 1 question.";
-      return;
-    }
-    if (!this.assessment.dueDate) {
-      this.errorMessage = "Due date is required.";
+  private handleError(err: any) {
+    this.serverErrorMessage = err.error?.message || 'A server error occurred.';
+    toast.error(this.serverErrorMessage);
+    this.cdr.detectChanges();
+  }
+
+  goBack(){
+    window.history.back()
+  }
+
+  submitBulkQuestions() {
+    const rawValue = this.bulkJsonInput.value;
+    if (!rawValue || rawValue.trim() === '') {
+      toast.warning('Please paste JSON data first');
       return;
     }
 
-    this.api.createAssessment(this.assessment).subscribe(() => {
-      this.router.navigate(['/courses', this.courseId]);
-    });
+    try {
+      // Parse the string into a JSON array
+      const questionsArray = JSON.parse(rawValue);
+
+      if (!Array.isArray(questionsArray)) {
+        toast.error('Data must be an array of questions [{}, {}]');
+        return;
+      }
+
+      // Automatically attach the current courseId to every question in the array
+      const sanitizedQuestions = questionsArray.map(q => ({
+        ...q,
+        courseId: this.courseId
+      }));
+
+      this.api.bulkCreateQuestions(sanitizedQuestions).subscribe({
+        next: (res) => {
+          toast.success(`${sanitizedQuestions.length} questions added successfully!`);
+          this.bulkJsonInput.reset();
+          this.loadQuestions(); // Refresh the list below
+          this.isBulkMode = false; // Switch back to normal view
+        },
+        error: (err) => {
+          this.serverErrorMessage = err.error?.message || 'Bulk upload failed. Check JSON format.';
+          toast.error('Bulk Upload Failed');
+        }
+      });
+    } catch (e) {
+      toast.error('Invalid JSON format. Please check your syntax.');
+    }
   }
+
+  toggleBulkMode() {
+    this.isBulkMode = !this.isBulkMode;
+  }
+
 }

@@ -2,7 +2,7 @@
   <div class="card shadow-lg border-0 mx-auto" style="max-width: 700px; border-radius: 12px;">
     <div class="card-header bg-primary bg-gradient text-white p-4" style="border-radius: 12px 12px 0 0;">
       <h4 class="mb-0 d-flex align-items-center">
-        <i class="bi bi-plus-circle-fill me-2"></i> Add Learning Material
+        <i class="bi bi-plus-circle-fill me-2"></i> {{ isEditMode() ? 'Edit Learning Material' : 'Add Learning Material' }}
       </h4>
     </div>
     
@@ -88,7 +88,7 @@
           <button type="submit" 
                   class="btn btn-primary btn-lg fw-bold shadow-sm" 
                   [disabled]="contentForm.invalid">
-            <i class="bi bi-cloud-arrow-up me-2"></i> Save Learning Material
+            <i class="bi bi-cloud-arrow-up me-2"></i> {{ isEditMode() ? 'Update Material' : 'Save Learning Material' }}
           </button>
           
           <button type="button" 

@@ -18,7 +18,8 @@ export class HomeComponent {
   private router = inject(Router);
 
   // Controls which form is visible ('register' or 'login')
-  activeTab = signal<'login' | 'register'>('register');
+  // Controls which form is visible ('register' or 'login')
+  activeTab = signal<'login' | 'register'>('login');
 
   // Assumes you moved logo.png to the 'public' folder for Angular 17+
   logoPath = '/logo.png'; 
@@ -86,14 +87,26 @@ export class HomeComponent {
         : this.authService.registerStudent(this.registerForm.value);
 
       request$.subscribe({
-        next: (res: any) => {
+        next: (res:any) => {
+
+          if(res.success){
           toast.success('Registration Successful', {
             description: res.message || 'Your account has been created. You can now log in.',
             duration: 4000
           });
           // Reset form and switch to login tab
+          console.log("registered")
           this.registerForm.reset({ roleType: 'STUDENT' });
           this.activeTab.set('login');
+        }else{
+          console.log("email exists")
+          toast.warning('Registration unsuccessfull', {
+            description: res.message || 'Your account has been created. You can now log in.',
+            duration: 4000
+          });
+
+        }
+
         },
         error: (err) => {
           const backendErrors = err.error?.errors || err.error?.message;

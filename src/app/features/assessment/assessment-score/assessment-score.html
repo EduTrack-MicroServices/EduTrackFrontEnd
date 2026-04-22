@@ -1,20 +1,72 @@
-<div class="container mt-5">
-
-  <div class="card shadow-sm mx-auto text-center" style="max-width: 450px;">
-    <div class="card-header bg-dark text-white p-3">
-      <h4>Your Score</h4>
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <div class="display-2 fw-bold text-dark mb-0">
+      {{ score }}<span class="text-muted fs-4">/{{ total }}</span>
     </div>
-
-    <div class="card-body p-4">
-      <h1 class="display-4">{{ score }}/{{ total }}</h1>
-
-      <p class="mt-3 fs-5">
-        {{ score === total ? 'Perfect Score!' : 'Well done!' }}
-      </p>
-
-      <a routerLink="/dashboard" class="btn btn-primary mt-3">Go Back</a>
-    </div>
-
+    <h3 class="fw-bold" [class.text-success]="passed" [class.text-danger]="!passed">
+      {{ passed ? 'Passed' : 'Failed! Retry' }}
+    </h3>
+    <button class="btn btn-dark rounded-pill px-5 mt-3 shadow-sm" routerLink="/dashboard">
+      Back to Dashboard
+    </button>
   </div>
 
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <h4 class="fw-bold mb-4 d-flex align-items-center">
+        <i class="bi bi-patch-question me-2 text-primary"></i> Review Answers
+      </h4>
+
+      @for (item of review; let i = $index; track i) {
+        <div
+          class="card mb-3 border-0 shadow-sm review-card"
+          [class.correct]="item.isCorrect"
+          [class.incorrect]="!item.isCorrect"
+        >
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h5 class="fw-bold mb-0 pe-3">
+                <span class="text-muted small">Q{{ i + 1 }}.</span> {{ item.question }}
+              </h5>
+              <span
+                class="badge rounded-pill"
+                [class.bg-success-subtle.text-success]="item.isCorrect"
+                [class.bg-danger-subtle.text-danger]="!item.isCorrect"
+              >
+                {{ item.isCorrect ? 'Correct' : 'Incorrect' }}
+              </span>
+            </div>
+
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div
+                  class="choice-box"
+                  [class.bg-success-subtle]="item.isCorrect"
+                  [class.bg-danger-subtle]="!item.isCorrect"
+                >
+                  <small class="text-uppercase fw-bold d-block mb-1" style="font-size: 0.7rem"
+                    >Your Answer</small
+                  >
+                  <span class="fw-semibold">{{ item.userChoice }}</span>
+                </div>
+              </div>
+
+              @if (!item.isCorrect) {
+                <div class="col-md-6">
+                  <div class="choice-box bg-light border text-dark">
+                    <small
+                      class="text-uppercase fw-bold text-muted d-block mb-1"
+                      style="font-size: 0.7rem"
+                      >Correct Answer</small
+                    >
+                    <span class="fw-bold">{{ item.correctAnswer }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
 </div>

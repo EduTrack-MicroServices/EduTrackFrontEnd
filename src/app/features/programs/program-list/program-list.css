@@ -1,0 +1,97 @@
+/* Typography and Spacing */
+.text-gradient {
+  background: linear-gradient(90deg, #0d6efd, #0099ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.uppercase-tracking {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
+
+/* Card Improvements */
+.modern-program-card {
+  border-radius: 20px !important;
+  background-color: #ffffff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-program-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Icon Wrapper */
+.program-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 6px 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+.status-active {
+  background-color: #e6fffa;
+  color: #047481;
+  border: 1px solid #b2f5ea;
+}
+
+.status-inactive {
+  background-color: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #edf2f7;
+}
+
+.dot {
+  height: 6px;
+  width: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  background-color: currentColor;
+}
+
+/* Line Clamp Fix */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 3.8rem; /* Keeps card heights consistent */
+}
+
+/* Button & UI Accents */
+.btn-white {
+  background: white;
+  border-color: #eee;
+}
+
+.btn-white:hover {
+  background: #f8f9fa;
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

@@ -1,12 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContentService } from '../../../core/services/content-service';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-content-form',
-  imports: [ReactiveFormsModule,CommonModule],
+  standalone: true, // Recommended for modern Angular
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './content-form.html',
   styleUrl: './content-form.css',
 })
@@ -17,8 +19,9 @@ export class ContentFormComponent implements OnInit {
   private router = inject(Router);
 
   moduleId!: number;
+  contentId: number | null = null;
+  isEditMode = signal<boolean>(false);
 
-  // Validation matches your Spring Boot @Pattern and @Size annotations
   contentForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
     contentType: ['Video', [Validators.required, Validators.pattern('Video|PDF|Slide|Lab')]],
@@ -28,27 +31,65 @@ export class ContentFormComponent implements OnInit {
   });
 
   ngOnInit() {
-    // Get the moduleId from the route: /modules/:moduleId/add-content
     this.moduleId = Number(this.route.snapshot.paramMap.get('moduleId'));
+    const id = this.route.snapshot.paramMap.get('contentId');
+
+    if (id) {
+      console.log(id)
+      this.contentId = Number(id);
+      this.isEditMode.set(true);
+      this.loadContentForEdit(this.contentId);
+    }
+  }
+
+  loadContentForEdit(id: number) {
+    this.contentService.getContentById(id).subscribe({
+      next: (res) => {
+        if (res.success) {
+          console.log(res.data)
+          this.contentForm.patchValue(res.data);
+        }
+        else{
+          console.log(res)
+        }
+      },
+      error: () => toast.error('Failed to load content details')
+    });
   }
 
   onSubmit() {
     if (this.contentForm.valid) {
-      // Create the object to match your backend Content model
-      const newContent = {
+      const payload = {
         ...this.contentForm.value,
         moduleId: this.moduleId
       };
 
-      this.contentService.saveContentByModule(this.moduleId, newContent as any).subscribe({
-        next: (res) => {
-          if (res.success) {
-            alert('Content added successfully to the module!');
-            window.history.back(); // Go back to the module viewer
-          }
-        },
-        error: (err) => alert(err.error?.message || 'Failed to save content')
-      });
+      if (this.isEditMode()) {
+        // UPDATE Existing Content
+        this.contentService.updateContent(this.contentId!, payload as any).subscribe({
+          next: (res) => {
+            if (res.success) {
+              toast.success('Content updated successfully');
+              window.history.back();
+            }
+            else{
+              console.log("update failed" +res)
+            }
+          },
+          error: (err) => toast.error(err.error?.message || 'Update failed')
+        });
+      } else {
+        // SAVE New Content
+        this.contentService.saveContentByModule(this.moduleId, payload as any).subscribe({
+          next: (res) => {
+            if (res.success) {
+              toast.success('Content added successfully');
+              window.history.back();
+            }
+          },
+          error: (err) => toast.error(err.error?.message || 'Save failed')
+        });
+      }
     }
   }
 }

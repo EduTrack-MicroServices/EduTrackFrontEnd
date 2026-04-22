@@ -1,60 +1,153 @@
-<div class="container-fluid bg-dark text-white min-vh-100 p-0">
+<div class="container-fluid bg-dark text-white min-vh-100 p-0 overflow-hidden">
   <div class="row g-0">
-    
-    <div class="col-lg-9 p-4">
+
+    <div class="col-lg-9 vh-100 d-flex flex-column p-4 overflow-auto">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold">{{ activeContent()?.title || 'Loading Content...' }}</h4>
-        <button class="btn btn-outline-light btn-sm" [routerLink]="['/programs', programId, 'courses', courseId]">Back to Course</button>
+        <div>
+          <nav aria-label="breadcrumb" class="small mb-1">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a [routerLink]="['/programs', programId, 'courses', courseId]"
+                  class="text-primary cursor-pointer text-decoration-none">Course</a></li>
+              <li class="breadcrumb-item active text-white-50">Module Viewer</li>
+            </ol>
+          </nav>
+          <h3 class="fw-bold mb-0 text-white">
+            {{ loading() ? 'Loading...' : (activeContent()?.title || 'No Content Available') }}
+          </h3>
+        </div>
+        <button class="btn btn-outline-light btn-sm rounded-pill px-3"
+          [routerLink]="['/programs', programId, 'courses', courseId]">
+          <i class="bi bi-arrow-left me-2"></i>Exit Viewer
+        </button>
       </div>
 
-      <div class="ratio ratio-16x9 shadow-lg rounded overflow-hidden bg-black">
-        @if (activeContent()) {
-          <iframe [src]="getSafeUrl(activeContent()!.contentUri)" 
-                  allowfullscreen 
-                  class="border-0">
-          </iframe>
-        } @else {
-          <div class="d-flex align-items-center justify-content-center h-100">
-            <p class="text-muted">Select a lesson to start studying.</p>
-          </div>
+      <div
+        class="ratio ratio-16x9 shadow-2xl rounded-3 overflow-hidden bg-black border border-secondary border-opacity-25">
+        @if (loading()) {
+        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+          <div class="spinner-border text-primary mb-3" role="status"></div>
+          <p class="text-muted">Preparing your lesson...</p>
+        </div>
+        } @else if (activeContent() && activeContent()?.contentUri) {
+  <iframe [src]="getSafeUrl(activeContent()!.contentUri)" 
+          allowfullscreen 
+          class="border-0">
+  </iframe>
+} @else if (activeContent() && !activeContent()?.contentUri) {
+  <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
+    <i class="bi bi-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+    <p class="text-white">This content does not have a valid URL.</p>
+  </div>
+} @else {
+        <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-5">
+          <i class="bi bi-Journal-x text-secondary mb-3" style="font-size: 4rem;"></i>
+          <h4 class="text-white-50">No content uploaded yet</h4>
+          <p class="text-muted small">Check back later or contact your instructor.</p>
+        </div>
         }
       </div>
-      
-      <div class="mt-4 p-3 bg-secondary bg-opacity-25 rounded" *ngIf="activeContent()">
-        <h5>About this Lesson</h5>
-        <p class="text-light-50">Type: {{ activeContent()?.contentType }} | Duration: {{ activeContent()?.duration }} mins</p>
+
+      @if (activeContent()) {
+      <div
+        class="mt-4 p-4 bg-white bg-opacity-10 border border-white border-opacity-10 rounded-3 animate__animated animate__fadeIn">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <span class="badge bg-primary px-3">{{ activeContent()?.contentType }}</span>
+          <span class="text-white-50 small"><i class="bi bi-clock me-1"></i> {{ activeContent()?.duration }} mins</span>
+        </div>
+        <h5 class="text-white mb-2">About this Lesson</h5>
+        <p class="text-light-50 mb-0">Learn the core concepts of {{ activeContent()?.title }}. Ensure you watch the full
+          video before marking the module as complete.</p>
       </div>
+      }
     </div>
 
-    <div class="col-lg-3 bg-white text-dark min-vh-100 shadow">
-      <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">Course Content</h5>
-        @if (isEditor()) {
-          <button class="btn btn-primary btn-sm" [routerLink]="['/modules', moduleId, 'add-content']">
+    <div class="col-lg-3 bg-white text-dark vh-100 d-flex flex-column shadow-lg">
+      <div class="p-4 border-bottom bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-dark">Course Curriculum</h5>
+          @if (isEditor()) {
+          <button class="btn btn-primary btn-sm rounded-circle shadow"
+            [routerLink]="['/modules', moduleId, 'add-content']">
             <i class="bi bi-plus-lg"></i>
           </button>
+          }
+        </div>
+        @if (contents().length > 0) {
+        <div class="progress mt-3" style="height: 6px;">
+          <div class="progress-bar" [style.width]="isModuleCompleted() ? '100%' : '0%'"></div>
+        </div>
         }
       </div>
 
-      <div class="list-group list-group-flush overflow-auto" style="max-height: 80vh;">
-        @for (item of contents(); track item.contentId) {
-          <div class="list-group-item list-group-item-action p-3" 
-               [class.active]="activeContent()?.contentId === item.contentId"
-               (click)="selectContent(item)" style="cursor: pointer;">
-            <div class="d-flex justify-content-between">
-              <div>
-                <i class="bi" [ngClass]="item.contentType === 'Video' ? 'bi-play-btn' : 'bi-file-earmark-pdf'"></i>
-                <span class="ms-2 small fw-bold">{{ item.title }}</span>
+      <div class="flex-grow-1 overflow-auto custom-scrollbar">
+        <div class="list-group list-group-flush">
+          @for (item of contents(); track item.contentId) {
+          <div class="list-group-item list-group-item-action border-0 py-3 px-4 position-relative"
+            [class.active-lesson]="activeContent()?.contentId === item.contentId" (click)="selectContent(item)"
+            style="cursor: pointer;">
+
+            <div class="d-flex align-items-center">
+              <div class="lesson-icon-circle me-3" [class.bg-primary]="activeContent()?.contentId === item.contentId">
+                <i class="bi" [ngClass]="item.contentType === 'Video' ? 'bi-play-fill' : 'bi-file-text-fill'"></i>
               </div>
-              @if (isEditor()) {
-                <div (click)="$event.stopPropagation()">
-                  <i class="bi bi-trash text-danger ms-2" (click)="onDelete(item.contentId!)"></i>
-                </div>
-              }
+
+              <div class="flex-grow-1 overflow-hidden">
+                <p class="mb-0 small fw-bold text-truncate"
+                  [class.text-primary]="activeContent()?.contentId === item.contentId">
+                  {{ item.title }}
+                </p>
+                <span class="text-muted smaller">{{ item.duration }} mins</span>
+              </div>
+
+              <div class="col-auto d-flex align-items-center gap-2">
+                @if (isEditor()) {
+                <span class="badge" [ngClass]="item.status === 'Draft' ? 'bg-warning text-dark' : 'bg-success'">
+                  {{ item.status }}
+                </span>
+
+                <button class="btn btn-link btn-sm text-primary p-0"
+                  [routerLink]="['/modules', moduleId, 'edit-content', item.contentId]">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+
+                <button class="btn btn-link btn-sm text-danger p-0"
+                  (click)="onDelete(item.contentId!); $event.stopPropagation()">
+                  <i class="bi bi-trash3"></i>
+                </button>
+                }
+              </div>
             </div>
           </div>
-        }
+          } @empty {
+          <div class="p-5 text-center text-muted">
+            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+            <p class="small mb-0">Curriculum is empty</p>
+          </div>
+          }
+        </div>
       </div>
+
+      @if (!isEditor() && contents().length > 0) {
+      <div class="p-4 border-top bg-light">
+        <div class="text-center">
+          @if (isModuleCompleted()) {
+          <div class="mb-3 text-success animate__animated animate__fadeIn">
+            <i class="bi bi-check-all fs-1"></i>
+            <h6 class="fw-bold mb-0">Module Completed!</h6>
+          </div>
+          } @else {
+          <p class="small text-muted mb-3">Finished all lessons in this module?</p>
+          }
+
+          <button class="btn btn-lg w-100 rounded-3 shadow-sm transition-all" [disabled]="isModuleCompleted()"
+            [ngClass]="isModuleCompleted() ? 'btn-success' : 'btn-primary'" (click)="markAsComplete()">
+            <i class="bi me-2" [ngClass]="isModuleCompleted() ? 'bi-patch-check-fill' : 'bi-check-circle'"></i>
+            {{ isModuleCompleted() ? 'Module Finished' : 'Mark Module as Complete' }}
+          </button>
+        </div>
+      </div>
+      }
     </div>
+
   </div>
 </div>

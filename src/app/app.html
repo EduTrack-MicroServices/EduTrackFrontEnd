@@ -1,16 +1,18 @@
-<ngx-sonner-toaster position="top-right" [richColors]="true" theme="light"></ngx-sonner-toaster>
-
 <div class="app-container">
-  @if (authService.userRole()) {
+  @if (showSidebar()) {
     <app-sidebar #sidebar="SidebarComponent"></app-sidebar>
-    
-    <main class="content-area" 
-          [class.content-shifted]="!sidebar.isCollapsed()" 
-          [class.content-collapsed]="sidebar.isCollapsed()">
+
+    <main
+      class="content-area"
+      [class.content-shifted]="!sidebar.isCollapsed()"
+      [class.content-collapsed]="sidebar.isCollapsed()"
+    >
+      <ngx-sonner-toaster position="top-right" richColors />
       <router-outlet></router-outlet>
     </main>
   } @else {
     <main class="full-width">
+      <ngx-sonner-toaster position="top-right" richColors />
       <router-outlet></router-outlet>
     </main>
   }
