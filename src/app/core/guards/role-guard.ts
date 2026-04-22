@@ -15,7 +15,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   } else {
     alert('Access Denied: Your role (' + userRole + ') does not have permission.');
-    router.navigate(['/dashboard']);
+    router.navigate(['/program-list']);
     return false;
   }
 };

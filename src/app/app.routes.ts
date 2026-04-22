@@ -26,9 +26,9 @@ import { guestGuard } from './core/guards/guest-guard';
 export const routes: Routes = [
 
 
-     
+
     {
-        path: 'home', component: HomeComponent,canActivate: [guestGuard]
+        path: 'home', component: HomeComponent, canActivate: [guestGuard]
     },
     {
         path: 'register', component: RegisterComponent
@@ -59,7 +59,7 @@ export const routes: Routes = [
         path: 'programs/edit/:id',
         component: ProgramFormComponent,
         canActivate: [authGuard, roleGuard],
-       data: { roles: ['INSTRUCTOR', 'ADMIN'] }
+        data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'student-progress',
@@ -80,11 +80,11 @@ export const routes: Routes = [
     {
         path: 'programs/:programId/add-course',
         component: CourseFormComponent, canActivate: [authGuard, roleGuard],
-       data: { roles: ['INSTRUCTOR', 'ADMIN'] }
+        data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'courses/edit/:courseId', component: CourseFormComponent, canActivate: [authGuard, roleGuard],
-       data: { roles: ['INSTRUCTOR', 'ADMIN'] }
+        data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'programs/:programId/courses/:courseId',
@@ -111,12 +111,13 @@ export const routes: Routes = [
         path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer',
         component: ModuleViewerComponent, canActivate: [authGuard]
     },
-   { path: 'modules/:moduleId/add-content', component: ContentFormComponent,canActivate: [authGuard]},
-{ path: 'modules/:moduleId/edit-content/:contentId', component: ContentFormComponent,canActivate: [authGuard] },
+    { path: 'modules/:moduleId/add-content', component: ContentFormComponent, canActivate: [authGuard] },
+    { path: 'modules/:moduleId/edit-content/:contentId', component: ContentFormComponent, canActivate: [authGuard] },
 
 
     {
-        path: 'courses/:courseId/assessment/create', component: AssessmentCreateComponent
+        path: 'courses/:courseId/assessment/create', component: AssessmentCreateComponent, canActivate: [authGuard, roleGuard],
+        data: { roles: ['INSTRUCTOR', 'ADMIN'] }
     },
     {
         path: 'courses/:courseId/assessment', component: AssessmentViewComponent
@@ -128,20 +129,20 @@ export const routes: Routes = [
         path: 'courses/:courseId/assessment/score', component: AssessmentScoreComponent
     },
     {
-  path: 'courses/:courseId/assessment/create',component:AssessmentCreateComponent
-},
-{
-  path: 'courses/:courseId/assessment/:assessmentId/edit',component:AssessmentCreateComponent
-},
-{
-  path: 'courses/:courseId/assessment',component: AssessmentViewComponent
-},
-{
-  path: 'courses/:courseId/assessment/:assessmentId/take',component: AssessmentTakeComponent
-},
-{
-  path: 'courses/:courseId/assessment/result',component: AssessmentScoreComponent
-},
+        path: 'courses/:courseId/assessment/create', component: AssessmentCreateComponent
+    },
+    {
+        path: 'courses/:courseId/assessment/:assessmentId/edit', component: AssessmentCreateComponent
+    },
+    {
+        path: 'courses/:courseId/assessment', component: AssessmentViewComponent
+    },
+    {
+        path: 'courses/:courseId/assessment/:assessmentId/take', component: AssessmentTakeComponent
+    },
+    {
+        path: 'courses/:courseId/assessment/result', component: AssessmentScoreComponent
+    },
     {
         path: '', redirectTo: 'home', pathMatch: 'full'
     }

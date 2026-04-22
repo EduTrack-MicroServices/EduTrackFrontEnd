@@ -51,7 +51,7 @@
               <select class="form-select border-secondary shadow-sm" id="roleFilter" [ngModel]="selectedUserRole()"
                 (ngModelChange)="selectedUserRole.set($event)">
                 <option value="">All Roles</option>
-                <option value="ADMIN">Admin</option>
+                <!-- <option value="ADMIN">Admin</option> -->
                 <option value="INSTRUCTOR">Instructor</option>
                 <option value="STUDENT">Student</option>
               </select>
@@ -78,6 +78,7 @@
             </thead>
             <tbody>
               @for (user of filteredUsers(); track user.userId) {
+           
               <tr>
                 <td class="ps-4">
                   <div class="d-flex align-items-center">
@@ -159,6 +160,7 @@
                   </button>
                 </td>
               </tr>
+
               } @empty {
               <tr>
                 <td colspan="6" class="text-center p-5 text-muted">

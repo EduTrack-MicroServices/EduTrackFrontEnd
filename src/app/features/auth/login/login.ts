@@ -21,6 +21,12 @@ export class LoginComponent {
     password: ['', Validators.required]
   });
 
+constructor(authService: AuthService) {
+  
+}
+
+
+
   onSubmit() {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({

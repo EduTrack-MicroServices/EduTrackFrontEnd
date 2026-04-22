@@ -8,7 +8,7 @@ export const guestGuard: CanActivateFn = (route, state) => {
 
   // If the user is already logged in, redirect them away from the login page
   if (authService.userRole()) {
-    router.navigate(['/dashboard']); 
+    router.navigate(['/program-list']); 
     return false;
   }
   return true;

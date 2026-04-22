@@ -53,6 +53,9 @@ export class HomeComponent {
             // Route based on role
             if (res.data.role === 'ADMIN') {
               this.router.navigate(['/admin-dashboard']);
+            }
+            else if (res.data.role === 'INSTRUCTOR') {
+              this.router.navigate(['/program-list']);
             } else {
               this.router.navigate(['/dashboard']);
             }

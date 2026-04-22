@@ -110,15 +110,14 @@ loadContents() {
 
   let embedUrl = url;
 
-  // Handle standard desktop links: youtube.com/watch?v=VIDEO_ID
+  
   if (embedUrl.includes('youtube.com/watch?v=')) {
     embedUrl = embedUrl.replace('watch?v=', 'embed/');
   } 
   
-  // Handle shortened mobile/share links: youtu.be/VIDEO_ID
+  
   else if (embedUrl.includes('youtu.be/')) {
-    // Extract the ID by splitting at 'youtu.be/' and then splitting at '?' to remove extra params
-    const videoId = embedUrl.split('youtu.be/')[1].split('?')[0];
+      const videoId = embedUrl.split('youtu.be/')[1].split('?')[0];
     embedUrl = `https://www.youtube.com/embed/${videoId}`;
   }
 

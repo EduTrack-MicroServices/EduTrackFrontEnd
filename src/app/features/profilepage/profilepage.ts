@@ -98,12 +98,12 @@ export class Profilepage implements OnInit {
           this.errorMessage.set('');
           this.passwordForm.reset();
         } else {
-          this.errorMessage.set(res.message || 'Failed to update password.');
+          this.errorMessage.set(res.errors?.join(', ') || 'Failed to update password.');
           this.successMessage.set('');
         }
       },
       error: (err) => {
-        this.errorMessage.set('An error occurred while changing the password.');
+        this.errorMessage.set('Old password is incorrect.');
         this.successMessage.set('');
       }
     });

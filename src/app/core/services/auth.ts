@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 interface DecodedToken {
   sub: string;
   role: string;
-  userId: number; // This matches your .claim("userId", ...)
+  userId: number; 
   iat: number;
   exp: number;
 }

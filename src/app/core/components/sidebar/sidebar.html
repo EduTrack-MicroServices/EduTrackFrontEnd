@@ -34,11 +34,13 @@
       <i class="bi bi-person-circle nav-icon"></i>
       @if (!isCollapsed()) { <span class="nav-text">My Profile</span> }
     </a>
+ @if (userRole() === 'STUDENT') {
 
     <a routerLink="/dashboard" routerLinkActive="active" class="nav-pill">
       <i class="bi bi-grid-fill nav-icon"></i>
       @if (!isCollapsed()) { <span class="nav-text">Dashboard</span> }
     </a>
+  }
     
     <a routerLink="/program-list" routerLinkActive="active" class="nav-pill">
       <i class="bi bi-search nav-icon"></i>
