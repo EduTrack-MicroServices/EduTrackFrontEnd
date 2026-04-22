@@ -1,11 +1,13 @@
 <div class="app-container">
   @if (showSidebar()) {
     <app-sidebar #sidebar="SidebarComponent"></app-sidebar>
-    
-    <main class="content-area" 
-          [class.content-shifted]="!sidebar.isCollapsed()" 
-          [class.content-collapsed]="sidebar.isCollapsed()">
-          <ngx-sonner-toaster position="top-right" richColors />
+
+    <main
+      class="content-area"
+      [class.content-shifted]="!sidebar.isCollapsed()"
+      [class.content-collapsed]="sidebar.isCollapsed()"
+    >
+      <ngx-sonner-toaster position="top-right" richColors />
       <router-outlet></router-outlet>
     </main>
   } @else {
