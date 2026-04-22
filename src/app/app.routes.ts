@@ -24,32 +24,32 @@ import { Profilepage } from './features/profilepage/profilepage';
 import { guestGuard } from './core/guards/guest-guard';
  
 export const routes: Routes = [
- 
- 
-     
-    {
-        path: 'home', component: HomeComponent,canActivate: [guestGuard]
-    },
-    {
-        path: 'register', component: RegisterComponent
-    },
-    {
-        path: 'dashboard', component: DashboardComponent,
-        canActivate: [authGuard],
- 
-    },
-    {
-        path: 'admin-dashboard',
-        component: AdminDashboardComponent,
-        canActivate: [authGuard, roleGuard],
-        data: { roles: ['ADMIN'] }
-    },
-    {
-        path: 'program-list', component: ProgramListComponent,
-        canActivate: [authGuard],
- 
-    },
- 
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [guestGuard],
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'admin-dashboard',
+    component: AdminDashboardComponent,
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN'] },
+  },
+  {
+    path: 'program-list',
+    component: ProgramListComponent,
+    canActivate: [authGuard],
+  },
+
   {
     path: 'programs/new',
     component: ProgramFormComponent,
@@ -73,13 +73,13 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   { path: 'profile', component: Profilepage },
- 
+
   {
     path: 'programs/:id',
     component: ProgramDetailsComponent,
     canActivate: [authGuard],
   },
- 
+
   {
     path: 'programs/:programId/add-course',
     component: CourseFormComponent,
@@ -112,7 +112,7 @@ export const routes: Routes = [
     component: ModuleFormComponent,
     canActivate: [authGuard],
   },
- 
+
   {
     path: 'programs/:programId/courses/:courseId/modules/:moduleId/viewer',
     component: ModuleViewerComponent,
@@ -128,7 +128,7 @@ export const routes: Routes = [
     component: ContentFormComponent,
     canActivate: [authGuard],
   },
- 
+
   {
     path: 'courses/:courseId/assessment/create',
     component: AssessmentCreateComponent,
